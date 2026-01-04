@@ -1,0 +1,40 @@
+# PROJET 5.1 ANTI-SPAM - FICHIERS IGNORÉS
+
+# 1. DONNÉES ET MODÈLES (trop lourds)
+data/
+maildir/
+models/
+*.pkl
+*.csv
+*.joblib
+
+# 2. CACHE PYTHON (généré automatiquement)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 3. ENVIRONNEMENTS (spécifique à chaque machine)
+venv/
+.env
+.venv/
+env/
+
+# 4. LOGS ET SORTIES (générés)
+logs/
+output/
+results/
+*.log
+*.out
+
+# 5. FICHIERS SYSTÈME
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 6. IDE (Visual Studio, PyCharm)
+.vscode/
+.idea/
+*.swp
+*.swo
+

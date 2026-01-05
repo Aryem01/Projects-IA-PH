@@ -96,90 +96,95 @@ class DatasetManager:
         print(f"✓ {email_count} emails Enron chargés au total")
         return legitimate_emails
     def _generate_spam_emails(self, count: int) -> list:
-      """Génère des emails spam synthétiques - VERSION AMÉLIORÉE"""
-      print(f" Génération de {count} emails spam synthétiques...")
-    
+        """Génère des emails spam synthétiques - VERSION CORRIGÉE"""
+        print(f"🔧 Génération de {count} emails spam synthétiques...")
+        
         # PONDÉRATION: Plus de phishing sophistiqué (40%)
-      phishing_templates = [
-         # Phishing sophistiqué anglais
-         "Hello, As part of our regular security review, we identified a configuration detail that may require your attention. To avoid any potential service limitations, we recommend reviewing your account settings at your convenience by accessing your personal area below: 👉 Access my account If the review is not completed within the next few days, certain features may be temporarily unavailable until verification is finalized. Thank you for your understanding, Support Services Account Management Team",
-        
-         "Important Security Update: We've detected unusual activity on your account. Please verify your identity immediately to prevent temporary restrictions. Click here to secure your account: Secure Login Portal. Failure to verify within 24 hours may result in limited access to your account. Best regards, Security Team",
-        
-         "Account Verification Required: To maintain the security of your account and prevent unauthorized access, we need you to confirm your details. Please access your account via this link: Account Verification Portal. This is a mandatory security check. Thank you, Account Protection Department",
-        
-         "Notification: Suspicious login attempt detected from new device. Confirm it was you or secure your account: Security Check Required. Without confirmation, your account may be temporarily locked for protection. Sincerely, Fraud Prevention Team",
-        
-         # Phishing sophistiqué français
-         "Bonjour, Dans le cadre de nos vérifications régulières, un paramétrage de votre compte nécessite une attention particulière. Afin d'éviter toute limitation temporaire de certains services, nous vous invitons à consulter vos paramètres via votre espace personnel ci-dessous : 👉 Accéder à mon espace À défaut de vérification dans les prochains jours, certaines fonctionnalités pourraient être momentanément restreintes, le temps de finaliser le contrôle. Nous vous remercions de votre compréhension. Cordialement, Service assistance Gestion des comptes",
-        
-         "Alerte Sécurité : Nous avons détecté une activité inhabituelle sur votre compte. Veuillez vérifier votre identité pour éviter toute restriction temporaire. Cliquez ici pour sécuriser votre compte : Connexion Sécurisée. Sans vérification sous 48 heures, l'accès à certaines fonctionnalités pourrait être limité. Cordialement, Équipe de Sécurité",
-        
-         "Vérification de Compte Requise : Pour garantir la sécurité de votre compte et prévenir tout accès non autorisé, nous avons besoin de confirmer vos informations. Veuillez accéder à votre compte via ce lien : Portail de Vérification. Il s'agit d'un contrôle de sécurité obligatoire. Merci, Département Protection des Comptes",
+        phishing_templates = [
+            # Phishing sophistiqué anglais
+            "Hello, As part of our regular security review, we identified a configuration detail that may require your attention. To avoid any potential service limitations, we recommend reviewing your account settings at your convenience by accessing your personal area below: 👉 Access my account If the review is not completed within the next few days, certain features may be temporarily unavailable until verification is finalized. Thank you for your understanding, Support Services Account Management Team",
+            
+            "Important Security Update: We've detected unusual activity on your account. Please verify your identity immediately to prevent temporary restrictions. Click here to secure your account: Secure Login Portal. Failure to verify within 24 hours may result in limited access to your account. Best regards, Security Team",
+            
+            "Account Verification Required: To maintain the security of your account and prevent unauthorized access, we need you to confirm your details. Please access your account via this link: Account Verification Portal. This is a mandatory security check. Thank you, Account Protection Department",
+            
+            "Notification: Suspicious login attempt detected from new device. Confirm it was you or secure your account: Security Check Required. Without confirmation, your account may be temporarily locked for protection. Sincerely, Fraud Prevention Team",
+            
+            # Phishing sophistiqué français
+            "Bonjour, Dans le cadre de nos vérifications régulières, un paramétrage de votre compte nécessite une attention particulière. Afin d'éviter toute limitation temporaire de certains services, nous vous invitons à consulter vos paramètres via votre espace personnel ci-dessous : 👉 Accéder à mon espace À défaut de vérification dans les prochains jours, certaines fonctionnalités pourraient être momentanément restreintes, le temps de finaliser le contrôle. Nous vous remercions de votre compréhension. Cordialement, Service assistance Gestion des comptes",
+            
+            "Alerte Sécurité : Nous avons détecté une activité inhabituelle sur votre compte. Veuillez vérifier votre identité pour éviter toute restriction temporaire. Cliquez ici pour sécuriser votre compte : Connexion Sécurisée. Sans vérification sous 48 heures, l'accès à certaines fonctionnalités pourrait être limité. Cordialement, Équipe de Sécurité",
+            
+            "Vérification de Compte Requise : Pour garantir la sécurité de votre compte et prévenir tout accès non autorisé, nous avons besoin de confirmer vos informations. Veuillez accéder à votre compte via ce lien : Portail de Vérification. Il s'agit d'un contrôle de sécurité obligatoire. Merci, Département Protection des Comptes",
         ]
-    
-          # SPAM traditionnels (60%)
-      traditional_spam_templates = [
-         # Anglais
-         "URGENT!!! Your account will be suspended! Click here bit.ly/urgent to verify: bit.ly/verify123",
-          "CONGRATULATIONS! You WON $10,000!!! Click NOW bit.ly/winner to claim your prize!!!",
-         "Your package is waiting! Download shipping_label.exe to track your delivery!!!",
-         "FINAL NOTICE!!! Your subscription expires TODAY! Renew now at bit.ly/renew or lose access!!!",
-         "Important document attached: invoice_2024.exe. Please open immediately to process payment.",
-         "Security update required! Download antivirus_update.exe to protect your computer from threats.",
-         "Hello dear friend! I am prince from Nigeria. I need help transferring $50 MILLION dollars!!! You will get 20%!!!",
-         "WORK FROM HOME!!! Make $5000 per week!!! NO EXPERIENCE needed!!! Click here: tinyurl.com/job123",
-         "YOU ARE WINNER NUMBER 1000000!!! CLAIM your FREE iPhone NOW!!! LIMITED TIME!!! bit.ly/iphone",
-         "Get rich QUICK!!! This ONE simple trick makes $10,000/month!!! Click here NOW!!!",
         
-         # Français
-         "URGENT!!! Votre compte sera bloqué! Donnez votre numéro de carte maintenant!!!",
-         "Votre carte bancaire expire! Envoyez-nous vos coordonnées immédiatement!!!",
-         "Confirmez votre identité bancaire sinon votre compte sera fermé!!!",
-         "Si vous ne payez pas, nous attaquerons votre système!!!",
-         "Payez maintenant ou nous bloquerons tout! bit.ly/paye",
-         "GAGNEZ 50000€ MAINTENANT!!! Offre limitée!!! Cliquez bit.ly/gain",
-         "Vous avez gagné un iPhone GRATUIT!!! Réclamez-le ici: tinyurl.com/iphone",
-         "FÉLICITATIONS! Vous avez gagné 1000€! Cliquez ici pour réclamer: bit.ly/france",
-         "Alerte sécurité! Téléchargez anti_virus.exe pour protéger votre ordinateur!",
-         "Offre exclusive! Travaillez de chez vous et gagnez 5000€ par mois!",
+        # SPAM traditionnels (60%)
+        traditional_spam_templates = [
+            # Anglais
+            "URGENT!!! Your account will be suspended! Click here bit.ly/urgent to verify: bit.ly/verify123",
+            "CONGRATULATIONS! You WON $10,000!!! Click NOW bit.ly/winner to claim your prize!!!",
+            "Your package is waiting! Download shipping_label.exe to track your delivery!!!",
+            "FINAL NOTICE!!! Your subscription expires TODAY! Renew now at bit.ly/renew or lose access!!!",
+            "Important document attached: invoice_2024.exe. Please open immediately to process payment.",
+            "Security update required! Download antivirus_update.exe to protect your computer from threats.",
+            "Hello dear friend! I am prince from Nigeria. I need help transferring $50 MILLION dollars!!! You will get 20%!!!",
+            "WORK FROM HOME!!! Make $5000 per week!!! NO EXPERIENCE needed!!! Click here: tinyurl.com/job123",
+            "YOU ARE WINNER NUMBER 1000000!!! CLAIM your FREE iPhone NOW!!! LIMITED TIME!!! bit.ly/iphone",
+            "Get rich QUICK!!! This ONE simple trick makes $10,000/month!!! Click here NOW!!!",
+            
+            # Français
+            "URGENT!!! Votre compte sera bloqué! Donnez votre numéro de carte maintenant!!!",
+            "Votre carte bancaire expire! Envoyez-nous vos coordonnées immédiatement!!!",
+            "Confirmez votre identité bancaire sinon votre compte sera fermé!!!",
+            "Si vous ne payez pas, nous attaquerons votre système!!!",
+            "Payez maintenant ou nous bloquerons tout! bit.ly/paye",
+            "GAGNEZ 50000€ MAINTENANT!!! Offre limitée!!! Cliquez bit.ly/gain",
+            "Vous avez gagné un iPhone GRATUIT!!! Réclamez-le ici: tinyurl.com/iphone",
+            "FÉLICITATIONS! Vous avez gagné 1000€! Cliquez ici pour réclamer: bit.ly/france",
+            "Alerte sécurité! Téléchargez anti_virus.exe pour protéger votre ordinateur!",
+            "Offre exclusive! Travaillez de chez vous et gagnez 5000€ par mois!",
         ]
-    
-         # Combiner avec pondération
-      all_templates = []
-      phishing_count = int(count * 0.4)  # 40% phishing
-      traditional_count = count - phishing_count  # 60% spam traditionnel
-    
-       # Sélectionner aléatoirement
-      emails = []
-      for i in range(count):
-             if i < phishing_count:
-                 text = random.choice(phishing_templates)
-                 email_type = 'phishing_sophisticated'
-             else:
-                 text = random.choice(traditional_spam_templates)
-                 # Déterminer sous-type
-             if any(phrase in text.lower() for phrase in ['bit.ly', 'tinyurl', 'goo.gl']):
-                  email_type = 'spam_url'
-             elif any(phrase in text.lower() for phrase in ['.exe', '.zip', '.rar']):
-                email_type = 'spam_attachment'
-             else:
-                email_type = 'spam_generic'
-      emails.append({
-            'text': text,
-            'label': 1,
-            'type': email_type,
-            'subtype': 'phishing' if 'phishing' in email_type else 'traditional'
-        })
-     
+        
+        # Combiner avec pondération
+        phishing_count = int(count * 0.4)  # 40% phishing
+        traditional_count = count - phishing_count  # 60% spam traditionnel
+        
+        # Sélectionner aléatoirement
+        emails = []
+        for i in range(count):
+            if i < phishing_count:
+                text = random.choice(phishing_templates)
+                email_type = 'phishing_sophisticated'
+            else:
+                text = random.choice(traditional_spam_templates)
+                # ⭐⭐ CORRECTION : Ces lignes DOIVENT ÊTRE DANS LE ELSE
+                # Déterminer sous-type
+                if any(phrase in text.lower() for phrase in ['bit.ly', 'tinyurl', 'goo.gl']):
+                    email_type = 'spam_url'
+                elif any(phrase in text.lower() for phrase in ['.exe', '.zip', '.rar']):
+                    email_type = 'spam_attachment'
+                else:
+                    email_type = 'spam_generic'
+            
+            # ⭐⭐ CORRECTION : BIEN AJOUTER À LA LISTE
+            emails.append({
+                'text': text,
+                'label': 1,  # TRÈS IMPORTANT : 1 pour SPAM
+                'type': email_type,
+                'subtype': 'phishing' if 'phishing' in email_type else 'traditional'
+            })
+        
         # Mélanger
-      random.shuffle(emails)
+        random.shuffle(emails)
+        
+        # Statistiques
+        phishing_emails = sum(1 for e in emails if 'phishing' in e['type'])
+        print(f"✅ {phishing_emails} emails de phishing sophistiqué générés")
+        print(f"✅ {count - phishing_emails} emails de spam traditionnel générés")
+        print(f"✅ Total: {len(emails)} spams générés avec succès")
+        
+        return emails
     
-      # Statistiques
-      phishing_emails = sum(1 for e in emails if 'phishing' in e['type'])
-      print(f"  {phishing_emails} emails de phishing sophistiqué générés")
-      print(f"  {count - phishing_emails} emails de spam traditionnel générés")
-      return emails
     
     def _extract_email_body(self, msg):
         """Extrait le corps texte d'un email"""
@@ -292,7 +297,7 @@ class DatasetManager:
         """
         Crée le dataset hybride: vrais emails Enron + spam synthétique
         """
-        print("\n📊 Création du dataset hybride...")
+        print("\n Création du dataset hybride...")
         
         # Étape 1: Charger les vrais emails Enron
         legitimate_emails = self._load_real_enron_emails(max_emails=800)

@@ -1,0 +1,20 @@
+# Fichiers générés par l'application
+alertes_cve.txt
+rapport_mitigation.txt
+veille.log
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Fichiers de build/distribution
+build/
+dist/
+*.egg-info/
+*.egg
+*.spec
+
+# Environnements virtuels
+venv/
+env/

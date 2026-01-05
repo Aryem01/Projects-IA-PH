@@ -418,7 +418,14 @@ if __name__ == "__main__":
     try:
         if args.mode == 'test':
             test_custom_emails(seuil=args.seuil)
+        elif args.test_rapide:
+            #   test rapide ne retourne pas 3 valeurs
+            print("\n" + "="*60)
+            print(" TEST RAPIDE  100 EMAILS")
+            print("="*60)
+            quick_test_100_emails(seuil=args.seuil)
         else:
+            # Mode évaluation complète
             spam_filter, evaluator, results = main()
             
             print("\n Pour d'autres modes:")

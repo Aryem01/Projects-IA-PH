@@ -32,7 +32,7 @@ results/
 Thumbs.db
 desktop.ini
 
-# 6. IDE (Visual Studio, PyCharm)
+# 6. IDE (Visual Studio)
 .vscode/
 .idea/
 *.swp

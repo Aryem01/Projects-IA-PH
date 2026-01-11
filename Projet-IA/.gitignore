@@ -1,40 +1,191 @@
-# PROJET 5.1 ANTI-SPAM - FICHIERS IGNORÉS
 
-# 1. DONNÉES ET MODÈLES (trop lourds)
-data/
+# .gitignore pour Projet Anti-Spam Hybride
+# ============================================================================
+
+# ============================================================================
+# DONNÉES ET DATASETS
+# ============================================================================
+# Dataset Enron (très volumineux, ne pas commit)
 maildir/
-models/
-*.pkl
-*.csv
-*.joblib
+data/raw/
+data/processed/*.csv
+data/processed/*.json
 
-# 2. CACHE PYTHON (généré automatiquement)
+# Garder la structure des dossiers
+!data/processed/.gitkeep
+!data/raw/.gitkeep
+
+# ============================================================================
+# MODÈLES ENTRAÎNÉS
+# ============================================================================
+# Modèles ML sauvegardés (fichiers .pkl volumineux)
+models/*.pkl
+models/*.joblib
+models/*.h5
+models/*.pt
+
+# Garder le dossier
+!models/.gitkeep
+!models/README.md
+
+# ============================================================================
+# RÉSULTATS ET RAPPORTS
+# ============================================================================
+results/*.txt
+results/*.csv
+results/*.json
+results/*.pdf
+results/*.html
+
+# Garder le dossier
+!results/.gitkeep
+
+# ============================================================================
+# CACHE PYTHON
+# ============================================================================
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
+.Python
 
-# 3. ENVIRONNEMENTS (spécifique à chaque machine)
+# Environnements virtuels
 venv/
-.env
-.venv/
 env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
 
-# 4. LOGS ET SORTIES (générés)
-logs/
-output/
-results/
-*.log
-*.out
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# 5. FICHIERS SYSTÈME
-.DS_Store
-Thumbs.db
-desktop.ini
+# ============================================================================
+# JUPYTER NOTEBOOKS
+# ============================================================================
+.ipynb_checkpoints/
+*.ipynb
 
-# 6. IDE (Visual Studio)
-.vscode/
+# ============================================================================
+# ÉDITEURS ET IDEs
+# ============================================================================
+# PyCharm
 .idea/
+*.iml
+*.iws
+.idea_modules/
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
 *.swp
 *.swo
+*~
 
+# ============================================================================
+# SYSTÈME D'EXPLOITATION
+# ============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================================================
+# LOGS ET DEBUGGING
+# ============================================================================
+*.log
+logs/
+*.out
+*.err
+
+# ============================================================================
+# GRADIO / INTERFACE
+# ============================================================================
+# Cache Gradio
+gradio_cached_examples/
+flagged/
+*.db
+
+# ============================================================================
+# TESTS ET COVERAGE
+# ============================================================================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# ============================================================================
+# FICHIERS TEMPORAIRES
+# ============================================================================
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# ============================================================================
+# SECRETS ET CONFIGURATION
+# ============================================================================
+# Ne JAMAIS commit de clés API ou mots de passe
+.env
+.env.local
+secrets.py
+config_private.py
+*.key
+*.pem
+
+# ============================================================================
+# FICHIERS SPÉCIFIQUES AU PROJET
+# ============================================================================
+# Fichiers de test personnalisés
+test_emails.txt
+spam_samples.txt
+ham_samples.txt
+
+# Sauvegardes
+backup/
+*.backup
+
+# ============================================================================
+# FICHIERS À GARDER (exceptions)
+# ============================================================================
+# Exemples de structure pour nouveaux utilisateurs
+!data/README.md
+!models/README.md
+!results/README.md
+
+# Fichier d'exemple de configuration
+!config_example.py

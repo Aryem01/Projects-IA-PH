@@ -1,6 +1,8 @@
 """
-Règles heuristiques pour la détection de spam 
+Règles heuristiques pour la détection de spam - VERSION AMÉLIORÉE
+Détection des spams indirects, phishing subtils et menaces violentes
 """
+
 import re
 
 class HeuristicRules:
@@ -20,7 +22,7 @@ class HeuristicRules:
             r'short\.ly/', r'cutt\.ly/', r'shorturl\.at/',
         ]
         
-        # 3. MOTS-CLÉS SPAM (Anglais + Français) 
+        # 3. MOTS-CLÉS SPAM - AUGMENTÉ pour menaces violentes
         self.spam_keywords =[
             # Gains / Argent (forte suspicion)
             'win money', 'free money', 'gagner argent', 'argent gratuit',
@@ -41,7 +43,7 @@ class HeuristicRules:
             'you won', 'vous avez gagné', 'selected winner',
             'free iphone', 'iphone gratuit', 'free gift',
             
-            # NOUVEAU: Phishing sophistiqué
+            # Phishing sophistiqué
             'activité inhabituelle', 'unusual activity', 'suspicious activity',
             'vérifier vos informations', 'verify your information', 'verify account',
             'accéder à mon espace', 'access your account', 'login to verify',
@@ -50,7 +52,7 @@ class HeuristicRules:
             'sous 48 heures', 'within 48 hours', 'dans les 24 heures',
             'action requise', 'action required', 'immediate action',
             
-            # AJOUT: Phrases de phishing sophistiqué
+            # Phrases de phishing sophistiqué
             'regular security review', 'vérifications régulières',
             'configuration detail', 'paramétrage de votre compte',
             'service limitations', 'limitation temporaire',
@@ -59,7 +61,8 @@ class HeuristicRules:
             'access my account', 'accéder à mon espace',
             'support services', 'service assistance',
             'account management', 'gestion des comptes',
-            # AJOUTER CES NOUVEAUX:
+            
+            # Phishing indirect/soft
             'contrôles périodiques',
             'point administratif',
             'vérification complémentaire',
@@ -78,10 +81,42 @@ class HeuristicRules:
             'next login',
             'compliance cell',
             'digital services',
-
+            
+            # Phishing indirect - phrases courtes
+            'vérification de compte',
+            'compte nécessaire',
+            'validation requise',
+            'mise à jour nécessaire',
+            'problème de sécurité',
+            'activité suspecte',
+            'connexion inhabituelle',
+            'sécuriser votre compte',
+            'votre compte a été',
+            'accès à votre compte',
+            'action nécessaire',
+            'mesures nécessaires',
+            'cher client',
+            'cher utilisateur',
+            
+            # MENACES VIOLENTES - NOUVEAU
+            'kill you', 'i will kill', 'je vais tuer',
+            'hurt you', 'i will hurt', 'je vais blesser',
+            'attack you', 'i will attack', 'je vais attaquer',
+            'threat', 'menace', 'danger', 'dangereux',
+            'violence', 'violent', 'weapon', 'arme',
+            'give me or', 'donne moi ou', 'give me or else',
+            'if you don\'t give', 'si tu ne donnes pas',
+            'or i will', 'ou je vais', 'otherwise i', 'sinon je',
+            'i will harm', 'je vais nuire', 'harm you', 'te nuire',
+            'bad things', 'mauvaises choses', 'regret', 'regretter',
+            'sorry', 'désolé', 'consequences', 'conséquences',
+            'pay the price', 'payer le prix', 'suffer', 'souffrir',
+            'destroy you', 'détruire toi', 'break you', 'casser toi',
+            'make you pay', 'te faire payer', 'you will die', 'tu vas mourir',
+            'going to kill', 'vais tuer', 'going to hurt', 'vais blesser',
         ]
         
-        # 4. MOTS LÉGITIMES FRANÇAIS 
+        # 4. MOTS LÉGITIMES FRANÇAIS - AMÉLIORÉ
         self.french_legitimate_patterns = [
             'bonne réception', 'accusons réception', 'en cours de traitement',
             'cordialement', 'bien cordialement', 'veuillez agréer',
@@ -92,9 +127,25 @@ class HeuristicRules:
             'nous vous informons', 'suite à votre demande',
             'objet : suivi', 'votre demande', 'ticket #',
             'référence', 'case #', 'numéro de dossier',
+            'facture', 'devis', 'commande', 'contrat',  # Documents légitimes
+            'réunion', 'meeting', 'appel', 'conférence',  # Communications
+            'rapport', 'présentation', 'analyse', 'budget',  # Travail
+            
+            # NOUVEAUX PATTERNS AJOUTÉS
+            'suivi de votre demande', 'prise en charge',
+            'finalisation du traitement', 'bien été prise en charge',
+            'vous sera communiqué', 'retour vous sera communiqué',
+            'demande a bien été', 'votre demande a été',
+            'notre service', 'par notre service',
+            'dès que possible', 'dès finalisation',
+            'en attente de traitement', 'traitement en cours',
+            'nous traitons votre demande', 'votre requête',
+            'suivi de dossier', 'numéro de suivi',
+            'pour information', 'pour votre information',
+            'en copie', 'cc :', 'c.c :',
         ]
         
-        # 5. PATTERNS DE MENACES (plus précis)
+        # 5. PATTERNS DE MENACES - AUGMENTÉ pour menaces violentes
         self.threat_patterns = [
             # Menaces directes
             r'sinon\s+(nous|je|on)\s+(bloqu|ferm|supprim)',
@@ -106,14 +157,15 @@ class HeuristicRules:
             r'dernier\s+(avertissement|rappel|delai)',
             r'final\s+(warning|notice|reminder)',
             
-            #  Menaces indirectes (phishing)
+            # Menaces indirectes (phishing)
             r'sans\s+action.*?(sous|dans|avant).*?(heure|jour)',
             r'(without|unless).*?action.*?(hour|day)',
             r'fonctionnalités?\s+(seront?|pourrai(en)?t\s+être)\s+(limitées?|restreintes?|bloquées?)',
             r'(service|account|features?)\s+(will\s+be|may\s+be)\s+(limited|restricted|suspended)',
             r'éviter.*?(interruption|suspension|blocage)',
             r'(avoid|prevent).*?(interruption|suspension|closure)',
-            # AJOUTER CES NOUVEAUX:
+            
+            # Phrases de phishing conformité
             r'afin d\'éviter toute mesure automatique',
             r'to avoid any automatic measures',
             r'pourraient être ajustées temporairement',
@@ -122,9 +174,98 @@ class HeuristicRules:
             r'according to current procedures',
             r'à défaut de consultation',
             r'without consultation',
+            
+            # MENACES VIOLENTES - NOUVEAU
+            r'i will\s+(kill|hurt|harm|attack|destroy)\s+you',
+            r'je vais\s+(tuer|blesser|nuire|attaquer|détruire)\s+(toi|vous)',
+            r'if you don\'t\s+.*?\s+i will',
+            r'si tu ne\s+.*?\s+je vais',
+            r'give me\s+.*?\s+or\s+i will',
+            r'donne moi\s+.*?\s+ou\s+je vais',
+            r'or i will\s+(kill|hurt|harm)',
+            r'ou je vais\s+(tuer|blesser|nuire)',
+            r'otherwise\s+i will\s+.*?(bad|harm|hurt)',
+            r'sinon\s+je vais\s+.*?(mal|blesser|nuire)',
+            r'threaten\s+to\s+(kill|hurt|harm)',
+            r'menace\s+de\s+(tuer|blesser|nuire)',
+            r'make you\s+(suffer|regret|pay)',
+            r'faire\s+(souffrir|regretter|payer)',
+            r'you will\s+(regret|suffer|die)',
+            r'tu vas\s+(regretter|souffrir|mourir)',
+            
+            # Extorsion avec menace
+            r'give me (money|cash|argent|bitcoin) or',
+            r'donne moi (argent|bitcoin|monnaie) ou',
+            r'send me (money|funds) or else',
+            r'envoie moi (argent|fonds) sinon',
+            r'pay me or i will',
+            r'paye moi ou je vais',
+            r'transfer (money|bitcoin) or',
+            r'transfère (argent|bitcoin) ou',
+            r'send.*?or i will.*?(kill|hurt)',
+            r'envoie.*?ou je vais.*?(tuer|blesser)',
         ]
         
-        # 6. STATISTIQUES DES RÈGLES
+        # 6. PATTERNS PHRASING INDIRECT
+        self.indirect_phishing_patterns = [
+            # Phrases qui semblent innocentes mais sont du phishing
+            r'vérification\s+(de\s+)?(votre\s+)?compte\s+(est\s+)?(nécessaire|requise|obligatoire)',
+            r'validation\s+(de\s+)?(votre\s+)?compte\s+(est\s+)?(nécessaire|requise)',
+            r'mise\s+à\s+jour\s+(de\s+)?(vos\s+)?informations',
+            r'actualisation\s+(de\s+)?(votre\s+)?profil',
+            r'problème\s+(de\s+)?sécurité\s+(avec\s+)?(votre\s+)?compte',
+            r'activité\s+suspecte\s+(sur\s+)?(votre\s+)?compte',
+            r'connexion\s+inhabituelle\s+(à\s+)?(votre\s+)?compte',
+            r'votre\s+compte\s+(a\s+été|est)\s+(signalé|flagé|noté)',
+            r'action\s+(est\s+)?(requise|nécessaire|obligatoire)',
+            r'mesures\s+(sont\s+)?(nécessaires|requises|obligatoires)',
+            r'étapes\s+(sont\s+)?(à\s+suivre|requises|nécessaires)',
+            
+            # Appels génériques
+            r'cher\s+(client|utilisateur|membre|abonné)',
+            r'dear\s+(customer|user|member|subscriber)',
+            
+            # Sans détails spécifiques
+            r'pour\s+(des\s+)?raisons\s+(de\s+)?sécurité',
+            r'for\s+security\s+reasons',
+            r'afin\s+de\s+(protéger|sécuriser)\s+votre\s+compte',
+            r'to\s+(protect|secure)\s+your\s+account',
+        ]
+        
+        # 7. PATTERNS DE MENACES VIOLENTES SPÉCIFIQUES
+        self.violent_threat_patterns = [
+            # Menaces de mort explicites
+            r'\bkill\s+(you|u|ya)\b',
+            r'\btuer\s+(toi|vous)\b',
+            r'\bmurder\s+(you|him|her)\b',
+            r'\bassassin(er)?\s+(toi|vous)\b',
+            
+            # Menaces de violence
+            r'\bhurt\s+(you|u)\b',
+            r'\bblesser\s+(toi|vous)\b',
+            r'\battack\s+(you|u)\b',
+            r'\battaquer\s+(toi|vous)\b',
+            
+            # Structure conditionnelle menaçante
+            r'if\s+.*?\s+(don\'t|do not)\s+.*?\s+(kill|hurt|harm)',
+            r'si\s+.*?\s+(ne|n\')\s+.*?\s+(tuer|blesser|nuire)',
+            r'unless\s+.*?\s+(kill|hurt|harm)',
+            r'\à\s+moins\s+que\s+.*?\s+(tuer|blesser|nuire)',
+            
+            # Extorsion violente
+            r'give\s+.*?\s+or\s+.*?\s+(kill|hurt|harm)',
+            r'donne\s+.*?\s+ou\s+.*?\s+(tuer|blesser|nuire)',
+            r'pay\s+.*?\s+or\s+.*?\s+(kill|hurt)',
+            r'paye\s+.*?\s+ou\s+.*?\s+(tuer|blesser)',
+            
+            # Conséquences violentes
+            r'you will\s+(die|suffer|regret)',
+            r'tu vas\s+(mourir|souffrir|regretter)',
+            r'bad things\s+will\s+happen',
+            r'il va\s+(t\'arriver|vous arriver)\s+malheur',
+        ]
+        
+        # 8. STATISTIQUES DES RÈGLES
         self.rule_triggers = {
             'dangerous_attachment': 0,
             'suspicious_url': 0,
@@ -133,16 +274,144 @@ class HeuristicRules:
             'excessive_caps': 0,
             'threats': 0,
             'money_amounts': 0,
-            'phishing_sophisticated': 0,  #  phishing sophistiqué
+            'phishing_sophisticated': 0,
+            'phishing_indirect': 0,
+            'short_suspicious': 0,
+            'no_reference': 0,
+            'violent_threats': 0,  # NOUVEAU
         }
         
-        # 7. CONFIGURATION
+        # 9. CONFIGURATION
         self.min_keywords_for_spam = 2
         self.caps_ratio_threshold = 0.6
     
+    def check_extreme_threats(self, email_text):
+        """Vérification ultra-rapide pour les menaces extrêmes"""
+        email_lower = email_text.lower()
+        
+        # Liste des menaces extrêmes qui doivent être bloquées immédiatement
+        extreme_threats = [
+            'kill you', 'i will kill', 'going to kill',
+            'tuer toi', 'je vais tuer', 'vais te tuer',
+            'hurt you', 'i will hurt', 'going to hurt',
+            'blesser toi', 'je vais blesser',
+            'give me or i will', 'donne moi ou je vais',
+            'or i will kill', 'ou je vais tuer',
+            'if you don\'t i will', 'si tu ne je vais',
+            'i\'ll kill you', 'j\'vais te tuer',
+            'make you die', 'te faire mourir',
+            'you will die', 'tu vas mourir',
+        ]
+        
+        for threat in extreme_threats:
+            if threat in email_lower:
+                self.rule_triggers['violent_threats'] += 1
+                return True, f"Menace extrême détectée: '{threat}'"
+        
+        return False, ""
+    
+    def check_violent_threats(self, email_text):
+        """Détecte spécifiquement les menaces de violence et extorsion"""
+        email_lower = email_text.lower()
+        
+        # Score de menace
+        threat_score = 0
+        signals = []
+        
+        # 1. Mots-clés de violence directs
+        violent_words = [
+            'kill', 'tuer', 'murder', 'assassin',
+            'hurt', 'blesser', 'harm', 'nuire',
+            'attack', 'attaquer', 'beat', 'battre',
+            'destroy', 'détruire', 'break', 'casser',
+            'die', 'mourir', 'death', 'mort',
+        ]
+        
+        for word in violent_words:
+            if word in email_lower:
+                threat_score += 2
+                signals.append(f"mot_violent: {word}")
+        
+        # 2. Patterns de menaces violentes
+        for pattern in self.violent_threat_patterns:
+            if re.search(pattern, email_lower):
+                threat_score += 3
+                signals.append("pattern_menace_violente")
+                break
+        
+        # 3. Extorsion avec menace
+        extortion_patterns = [
+            r'give me (money|bitcoin|cash|argent) or i will',
+            r'donne moi (argent|bitcoin|monnaie) ou je vais',
+            r'send me (money|funds) or else',
+            r'envoie moi (argent|fonds) sinon',
+            r'pay me or i will',
+            r'paye moi ou je vais',
+            r'transfer .*? or i will',
+            r'transfère .*? ou je vais',
+        ]
+        
+        for pattern in extortion_patterns:
+            if re.search(pattern, email_lower):
+                threat_score += 4
+                signals.append("extorsion_menace")
+                break
+        
+        # 4. Structure conditionnelle menaçante
+        conditional_patterns = [
+            r'if you don\'t .*? i will .*? (kill|hurt|harm|attack)',
+            r'si tu ne .*? je vais .*? (tuer|blesser|nuire|attaquer)',
+            r'unless you .*? i will .*? (kill|hurt|attack)',
+            r'\à moins que tu .*? je vais .*? (tuer|blesser|attaquer)',
+        ]
+        
+        for pattern in conditional_patterns:
+            if re.search(pattern, email_lower):
+                threat_score += 3
+                signals.append("condition_menaçante")
+                break
+        
+        # 5. Pronoms personnels + verbes de menace
+        personal_threats = [
+            ('i will', 'kill you'), ('i will', 'hurt you'),
+            ('je vais', 'te tuer'), ('je vais', 'te blesser'),
+            ('i\'ll', 'kill you'), ('i\'ll', 'hurt you'),
+            ('j\'vais', 'te tuer'), ('j\'vais', 'te blesser'),
+        ]
+        
+        for pronoun, action in personal_threats:
+            if pronoun in email_lower and action in email_lower:
+                threat_score += 5
+                signals.append(f"menace_personnelle: {pronoun} {action}")
+                break
+        
+        # 6. Menaces de conséquence
+        consequence_words = ['regret', 'suffer', 'pay', 'consequences',
+                           'regretter', 'souffrir', 'payer', 'conséquences',
+                           'bad things', 'mauvaises choses', 'malheur']
+        
+        consequence_count = 0
+        for word in consequence_words:
+            if word in email_lower:
+                consequence_count += 1
+        
+        if consequence_count >= 2:
+            threat_score += 2
+            signals.append(f"conséquences_multiples: {consequence_count}")
+        
+        # Seuil de détection
+        if threat_score >= 4:
+            self.rule_triggers['violent_threats'] += 1
+            reason_parts = [f"Score menace: {threat_score}"]
+            if signals:
+                reason_parts.append(f"Signaux: {', '.join(signals[:3])}")
+            return True, " | ".join(reason_parts)
+        
+        return False, ""
+    
     def check_dangerous_attachments(self, email_text):
         """
-        Détecte les VRAIES menaces de pièces jointes (VERSION CORRIGÉE)
+        Détecte les VRAIES menaces de pièces jointes
         """
         email_lower = email_text.lower()
         
@@ -210,7 +479,7 @@ class HeuristicRules:
         """
         email_lower = email_text.lower()
         
-        #  Vérifier d'abord si c'est un email légitime français
+        # Vérifier d'abord si c'est un email légitime français
         legitimate_score = 0
         for pattern in self.french_legitimate_patterns:
             if pattern in email_lower:
@@ -223,12 +492,14 @@ class HeuristicRules:
         else:
             required_keywords = self.min_keywords_for_spam
         
-        # Compter les mots-clés spam
+        # Compter les mots-clés spam - CORRIGÉ : recherche exacte
         count = 0
         found_keywords = []
         
         for keyword in self.spam_keywords:
-            if keyword in email_lower:
+            # Vérifier avec regex pour trouver le mot-clé exact (pas une sous-chaîne)
+            pattern = r'\b' + re.escape(keyword) + r'\b'
+            if re.search(pattern, email_lower):
                 count += 1
                 found_keywords.append(keyword)
         
@@ -254,7 +525,7 @@ class HeuristicRules:
         return False
     
     def check_excessive_caps(self, email_text):
-        """Détecte les majuscules excessives (VERSION AMÉLIORÉE)"""
+        """Détecte les majuscules excessives"""
         if len(email_text) < 30:  
             return False
         
@@ -272,11 +543,52 @@ class HeuristicRules:
         return False
     
     def check_threats(self, email_text):
-        """Détecte les menaces et fausses urgences (VERSION AMÉLIORÉE)"""
+        """Détecte les menaces et fausses urgences - VERSION AMÉLIORÉE"""
         email_lower = email_text.lower()
         
         # Vérifier les patterns de menaces directs
         for pattern in self.threat_patterns:
+            if re.search(pattern, email_lower):
+                self.rule_triggers['threats'] += 1
+                return True
+        
+        # Vérification supplémentaire pour les menaces violentes explicites
+        violent_phrases = [
+            # Menaces de mort
+            'i will kill you', 'kill you', 'going to kill',
+            'je vais te tuer', 'te tuer', 'vais te tuer',
+            'you will die', 'tu vas mourir',
+            
+            # Menaces de violence
+            'i will hurt you', 'hurt you', 'going to hurt',
+            'je vais te blesser', 'te blesser', 'vais te blesser',
+            'break your', 'casser ton', 'casser votre',
+            
+            # Extorsion
+            'give me or i will', 'give me or else',
+            'donne moi ou je vais', 'donne moi sinon',
+            'send money or', 'envoie argent ou',
+            
+            # Menaces implicites
+            'bad things will happen', 'il va t\'arriver malheur',
+            'you will regret', 'tu vas regretter',
+            'make you suffer', 'te faire souffrir',
+        ]
+        
+        for phrase in violent_phrases:
+            if phrase in email_lower:
+                self.rule_triggers['threats'] += 1
+                return True
+        
+        # Vérifier la structure "if...then" menaçante
+        if_then_patterns = [
+            r'if you (don\'t|do not) .*? (i will|i\'ll) .*? (kill|hurt|harm|attack)',
+            r'si tu (ne|n\') .*? (je vais|j\'vais) .*? (tuer|blesser|nuire|attaquer)',
+            r'unless you .*? (i will|i\'ll) .*? (kill|hurt)',
+            r'\à moins que tu .*? (je vais) .*? (tuer|blesser)',
+        ]
+        
+        for pattern in if_then_patterns:
             if re.search(pattern, email_lower):
                 self.rule_triggers['threats'] += 1
                 return True
@@ -311,7 +623,6 @@ class HeuristicRules:
     def check_phishing_sophisticated(self, email_text):
         """
         Détecte les emails de phishing sophistiqués
-        Ces emails imitent des communications légitimes mais contiennent des signaux suspects
         """
         email_lower = email_text.lower()
         
@@ -341,7 +652,7 @@ class HeuristicRules:
         for phrase in limitation_phrases:
             if phrase in email_lower:
                 phishing_score += 2  # Plus grave
-      
+        
         time_pressure = [
             'within the next few days', 'in the next few days',
             'dans les prochains jours', 'sous 48 heures', 'under 48 hours',
@@ -505,39 +816,144 @@ class HeuristicRules:
         
         return False, ""
     
-    # CORRECTION : UNE SEULE méthode apply_rules BIEN INDENTÉE
+    def check_indirect_phishing(self, email_text):
+        """Détecte le phishing indirect/subtil"""
+        email_lower = email_text.lower()
+        
+        # 1. Vérifier les patterns de phishing indirect
+        indirect_score = 0
+        for pattern in self.indirect_phishing_patterns:
+            if re.search(pattern, email_lower):
+                indirect_score += 2
+        
+        # 2. Email court mais avec termes suspects
+        if len(email_text) < 150:  # Email court
+            short_suspicious_terms = [
+                'vérification', 'compte', 'nécessaire', 'requis',
+                'sécurité', 'action', 'urgence', 'important',
+                'validation', 'mise à jour', 'problème',
+            ]
+            
+            term_count = 0
+            for term in short_suspicious_terms:
+                if term in email_lower:
+                    term_count += 1
+            
+            if term_count >= 2:
+                indirect_score += 2
+        
+        # 3. Absence de références légitimes
+        has_legitimate_reference = any(pattern in email_lower for pattern in [
+            'référence', 'ticket', 'dossier', 'numéro', '#', 
+            'facture', 'devis', 'commande', 'contrat',
+            'rapport', 'présentation', 'meeting', 'réunion'
+        ])
+        
+        if not has_legitimate_reference and indirect_score > 0:
+            indirect_score += 2
+            self.rule_triggers['no_reference'] += 1
+        
+        # 4. Appel générique vs spécifique
+        has_generic_call = any(pattern in email_lower for pattern in [
+            'cher client', 'cher utilisateur', 'dear customer', 'dear user'
+        ])
+        
+        has_specific_call = any(pattern in email_lower for pattern in [
+            'madame', 'monsieur', 'm.', 'mr.', 'ms.',
+            'john', 'sarah', 'michael', 'david', 'lisa'
+        ])
+        
+        if has_generic_call and not has_specific_call:
+            indirect_score += 1
+        
+        # Seuil de détection
+        if indirect_score >= 5:
+            self.rule_triggers['phishing_indirect'] += 1
+            return True, f"Phishing indirect détecté (score: {indirect_score})"
+        
+        return False, ""
+    
+    def check_short_suspicious_email(self, email_text):
+        """Détecte les emails courts mais suspects"""
+        if len(email_text) < 120:  # Très court
+            email_lower = email_text.lower()
+            
+            # Termes suspects dans un email court
+            suspicious_in_short = [
+                'vérification de compte',
+                'compte nécessaire',
+                'action requise',
+                'sécurité',
+                'urgence',
+                'important',
+                'cliquez',
+                'lien',
+                'accéder',
+            ]
+            
+            count = 0
+            for term in suspicious_in_short:
+                if term in email_lower:
+                    count += 1
+            
+            # Si l'email est court et contient 2+ termes suspects
+            if count >= 2:
+                self.rule_triggers['short_suspicious'] += 1
+                return True, f"Email court mais suspect ({count} indicateurs)"
+        
+        return False, ""
+    
     def apply_rules(self, email_text):
         """
         Applique toutes les règles heuristiques 
-        Ordre d'exécution optimisé pour réduire faux positifs
+        Ordre d'exécution optimisé
         """
-        # 1. Pièces jointes dangereuses (très fiable)
+        # 0. Vérification ultra-rapide des menaces extrêmes (PRIORITÉ MAXIMALE)
+        is_extreme_threat, extreme_reason = self.check_extreme_threats(email_text)
+        if is_extreme_threat:
+            return True, extreme_reason
+        
+        # 1. Menaces violentes spécifiques
+        is_violent_threat, violent_reason = self.check_violent_threats(email_text)
+        if is_violent_threat:
+            return True, violent_reason
+        
+        # 2. Pièces jointes dangereuses (très fiable)
         if self.check_dangerous_attachments(email_text):
             return True, "Pièce jointe dangereuse détectée (.exe, .zip avec action suspecte)"
         
-        # 2. URLs suspectes (fiable)
+        # 3. URLs suspectes (fiable)
         if self.check_suspicious_urls(email_text):
             return True, "URL raccourcie suspecte détectée (bit.ly, tinyurl, etc.)"
         
-        # 3. NOUVEAU: Phishing conformité sophistiqué
+        # 4. Menaces directes
+        if self.check_threats(email_text):
+            return True, "Menace ou ultimatum détecté"
+        
+        # 5. Phishing conformité sophistiqué
         is_compliance_phishing, compliance_reason = self.check_compliance_phishing(email_text)
         if is_compliance_phishing:
             return True, compliance_reason
         
-        # 4. NOUVEAU: Menaces passives
+        # 6. Phishing indirect
+        is_indirect_phishing, indirect_reason = self.check_indirect_phishing(email_text)
+        if is_indirect_phishing:
+            return True, indirect_reason
+        
+        # 7. Email court mais suspect
+        is_short_suspicious, short_reason = self.check_short_suspicious_email(email_text)
+        if is_short_suspicious:
+            return True, short_reason
+        
+        # 8. Menaces passives
         is_passive_threat, passive_reason = self.check_passive_threats(email_text)
         if is_passive_threat:
             return True, passive_reason
         
-        # 5. Phishing sophistiqué général
+       
         if self.check_phishing_sophisticated(email_text):
             return True, "Tentative de phishing sophistiquée détectée"
-        
-        # 6. Menaces directes (fiable)
-        if self.check_threats(email_text):
-            return True, "Menace ou ultimatum détecté"
-        
-        # 7. Combinaison de signaux (plus prudent)
+    
         signals = 0
         reasons = []
         
@@ -546,7 +962,7 @@ class HeuristicRules:
             reasons.append("gros montant d'argent")
         
         if self.check_spam_keywords(email_text):
-            signals += 2  # Poids plus important
+            signals += 2
             reasons.append("mots-clés spam multiples")
         
         if self.check_excessive_caps(email_text):
@@ -576,24 +992,38 @@ class HeuristicRules:
 
 # TEST
 if __name__ == "__main__":
-    print(" Test des règles améliorées avec phishing...\n")
+    print(" Test des règles améliorées avec détection de menaces violentes...\n")
     
     rules = HeuristicRules()
     
     test_emails = [
-        # Phishing sophistiqué 
-        ("Hello,As part of our regular security review, we identified a configuration detail that may require your attention.To avoid any potential service limitations, we recommend reviewing your account settings at your convenience by accessing your personal area below:👉 Access my accountIf the review is not completed within the next few days, certain features may be temporarily unavailable until verification is finalized.Thank you for your understanding,Support ServicesAccount Management Team", True),
+        # Menaces violentes - DEVRAIENT ÊTRE DÉTECTÉS COMME SPAM
+        ("give me monney if you don't give it i will kill you", True),
+        ("give me money or i will hurt you", True),
+        ("donne moi l'argent sinon je vais te tuer", True),
+        ("send bitcoin or i will attack you", True),
+        ("if you don't pay i will kill your family", True),
+        ("je vais te blesser si tu ne donnes pas", True),
+        ("pay me $1000 or i will destroy you", True),
+        ("transfer the money or you will regret", True),
         
-        ("Bonjour,Dans le cadre de nos vérifications régulières, un paramétrage de votre compte nécessite une attention particulière.Afin d'éviter toute limitation temporaire de certains services, nous vous invitons à consulter vos paramètres via votre espace personnel ci-dessous :👉 Accéder à mon espaceÀ défaut de vérification dans les prochains jours, certaines fonctionnalités pourraient être momentanément restreintes, le temps de finaliser le contrôle.Nous vous remercions de votre compréhension.Cordialement,Service assistanceGestion des comptes", True),
+        # Phishing indirect
+        ("bonjour Une vérification de votre compte est nécessaire", True),
+        ("Cher client, une action est requise pour votre compte", True),
+        ("Notification: problème de sécurité détecté sur votre compte", True),
         
-        # LÉGITIMES 
-        ("Dear user, your ticket #12345 has been received. We will process it within 24 hours. You can check status at our support portal. Sincerely, Customer Support", False),
+       
+        ("Bonjour, votre dossier #12345 est en traitement", False),
+        ("Madame Dupont, voici le rapport demandé pour la réunion", False),
+        ("Facture #F2024001 en pièce jointe", False),
+        ("Please review the attached document for tomorrow's meeting", False),
         
-        ("Bonjour, nous accusons réception de votre dossier #REF789. Le traitement est en cours. Cordialement, Service Client", False),
         
-        # SPAM évidents
-        ("URGENT!!! Download virus.exe NOW!!! Click bit.ly/xxx", True),
-        ("WIN 10000 DZD FREE MONEY!!! Click bit.ly/scam NOW!!!", True),
+        ("Subject: Suivi de votre demande\n\nBonjour,\n\nVotre demande a bien été prise en charge par notre service.\nUn retour vous sera communiqué dès finalisation du traitement.\n\nCordialement,\nService administratif", False),
+        
+        
+        ("Bonjour,\n\nVotre demande est en attente de traitement.\nNous vous répondrons dès que possible.\n\nBien cordialement,\nService client", False),
+        ("Suite à votre demande du 15/01/2024, nous traitons votre requête.\nNuméro de suivi: REF-2024-00123", False),
     ]
     
     correct = 0
@@ -609,3 +1039,29 @@ if __name__ == "__main__":
         print()
     
     print(f"\n Précision: {correct}/{len(test_emails)} ({correct/len(test_emails)*100:.1f}%)")
+    
+    
+    print("\n" + "="*80)
+    print("TEST SPÉCIFIQUE DE VOTRE CAS:")
+    print("="*80)
+    email = "give me monney if you don't give it i will kill you"
+    is_spam, reason = rules.apply_rules(email)
+    print(f"Email: {email}")
+    print(f"Résultat: {'🚫 SPAM' if is_spam else '✅ LÉGITIME'}")
+    print(f"Raison: {reason}")
+    
+    print("\n" + "="*80)
+    print("TEST DE L'EMAIL LÉGITIME:")
+    print("="*80)
+    email_legitime = """Bonjour,
+
+Votre demande a bien été prise en charge par notre service.
+Un retour vous sera communiqué dès finalisation du traitement.
+
+Cordialement,
+Service administratif"""
+    is_spam, reason = rules.apply_rules(email_legitime)
+    print(f"Email: {email_legitime}")
+    print(f"Résultat: {'🚫 SPAM' if is_spam else '✅ LÉGITIME'}")
+    print(f"Raison: {reason}")
+    print("="*80)

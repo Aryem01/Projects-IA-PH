@@ -438,3 +438,5 @@ if __name__ == "__main__":
     # Charger et splitter le dataset
     print("\n\n Chargement et split du dataset...")
     X_train, X_test, y_train, y_test = dm.get_train_test_split()
+
+

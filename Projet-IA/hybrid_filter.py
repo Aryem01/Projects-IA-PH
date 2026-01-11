@@ -98,7 +98,7 @@ class HybridSpamFilter:
                 'is_spam': True,
                 'method': 'heuristic',
                 'reason': reason_rules,
-                'confidence': 0.95,  # Règles très fiables
+                'confidence': 0.95,  
                 'ml_probability': None,
                 'processing_time_ms': processing_time
             }
@@ -240,7 +240,7 @@ class HybridSpamFilter:
             print("  Cache effacé")
 
 
-# FONCTION UTILITAIRE
+
 def create_spam_filter(threshold: float = 0.65, language: str = 'french') -> HybridSpamFilter:
     """
     Crée un filtre anti-spam optimisé

@@ -30,7 +30,7 @@ def parse_arguments():
     parser.add_argument('--dataset-taille', type=int, default=1000,
                        help='Taille dataset (défaut: 1000 comme 5.1.pdf)')
     
-    # Argument positionnel pour le mode
+
     parser.add_argument('mode', nargs='?', choices=['train', 'test'], default='train',
                        help='Mode: "train" pour évaluation, "test" pour mode interactif')
     
@@ -48,14 +48,13 @@ def quick_test_100_emails(seuil=0.5):
     X_test = X[:100]
     y_test = y[:100]
     
-    # Créer un filtre avec le seuil donné
+  
     spam_filter = HybridSpamFilter(ml_threshold=seuil)
     
     # Entraînement rapide
     print("Entraînement rapide du modèle...")
     spam_filter.train_ml_model(X[:200], y[:200])
     
-    # Évaluation
     evaluator = SpamFilterEvaluator(spam_filter)
     results = evaluator.evaluate(X_test, y_test, verbose=False)
     
@@ -95,19 +94,17 @@ def main():
     if args.mode == 'test':
         test_custom_emails()
         return
-    
-    # Mode évaluation complète (par défaut)
+
     print("\n   PROJET 5.1 - ANTI-SPAM HYBRIDE (Règles + Machine Learning)")
     print("="*80 + "\n")
     
-    # Créer les dossiers nécessaires
     os.makedirs('./data/processed', exist_ok=True)
     os.makedirs('./models', exist_ok=True)
     os.makedirs('./results', exist_ok=True)
     
-    # Afficher la méthodologie
+    
     print(" MÉTHODOLOGIE:")
-    print("-" * 80)
+    print("=" * 80)
     print("  • Règles heuristiques: .exe, bit.ly, mots-clés, majuscules excessives")
     print("  • Machine Learning: Naive Bayes + TF-IDF (ngram_range=(1,2))")
     print("  • Approche hybride: Règles d'abord, ML pour les cas douteux")
@@ -121,11 +118,10 @@ def main():
     
     dataset_manager = DatasetManager(data_dir='./data')
     
-    # Télécharger/générer le dataset
+ 
     print("\n Chargement des emails Enron (peut prendre 1-2 minutes)...")
     dataset_file = dataset_manager.download_enron_dataset()
     
-    # Split train/test
     X_train, X_test, y_train, y_test = dataset_manager.get_train_test_split(
         test_size=0.2,
         random_state=42
@@ -159,10 +155,9 @@ def main():
     print("\n ÉTAPE 2: Création du système anti-spam hybride")
     print("-" * 80)
     
-    # UTILISER args.seuil ici
     spam_filter = HybridSpamFilter(ml_threshold=args.seuil)
     
-    # Entraîner le composant ML
+   
     print("\n Entraînement du modèle Machine Learning...")
     ml_start = time.time()
     spam_filter.train_ml_model(X_train, y_train)
@@ -206,7 +201,7 @@ def main():
     
     #   Analyse détaillée des règles si demandé
     if args.afficher_regles:
-        print("\n🔍 ANALYSE DÉTAILLÉE DES RÈGLES (sur demande)")
+        print("\n ANALYSE DÉTAILLÉE DES RÈGLES (sur demande)")
         print("-" * 80)
         stats = spam_filter.get_statistics()
         if 'rule_triggers' in stats:

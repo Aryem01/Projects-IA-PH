@@ -175,30 +175,29 @@ with gr.Blocks(title="Anti-Spam Hybride", theme=gr.themes.Soft()) as demo:
         outputs=[verdict_output, method_output, confidence_output, reason_output, stats_output]
     )
 
-
 if __name__ == "__main__":
     print("\n" + "="*60)
     print(" LANCEMENT DE L'INTERFACE GRADIO")
     print("="*60)
     
+    import gradio as gr
+    print(f" Version Gradio: {gr.__version__}")
+    
     
     base_port = 7860
     port = base_port
     
-    if not is_port_available(base_port):
-        print(f"  Port {base_port} occupé, recherche d'un port disponible...")
-        for p in range(base_port + 1, base_port + 20):
-            if is_port_available(p):
-                port = p
-                print(f" Port {p} disponible")
-                break
+    while not is_port_available(port) and port < base_port + 20:
+        port += 1
     
-  
-    print(f"\n Choisissez un mode:")
-    print(f"  1. Lien public (partageable, bloque le terminal)")
-    print(f"  2. Interface locale (terminal utilisable) - Port: {port}")
-    print(f"  3. Mode terminal seulement (pas d'interface web)")
-    print(f"  4. Quitter")
+    print(f"\nPort disponible trouvé: {port}")
+    
+    # MODES
+    print(f"\n Modes disponibles:")
+    print(f"  1.  Lien PUBLIC (Gradio Share)")
+    print(f"  2.  Local SEULEMENT (Localhost:{port})")
+    print(f"  3.  Terminal uniquement")
+    print(f"  4.  Quitter")
     
     try:
         choice = input("\nVotre choix (1/2/3/4): ").strip()
@@ -208,7 +207,7 @@ if __name__ == "__main__":
             sys.exit(0)
             
         elif choice == "3":
-          
+            print("\n MODE TERMINAL ACTIVÉ")
             print("\n MODE TERMINAL ACTIVÉ")
             print("Tapez 'quit' pour quitter\n")
             
@@ -242,42 +241,53 @@ if __name__ == "__main__":
                 print(f"   Confiance: {result['confidence']:.1%}")
                 print(f"   Raison: {result['reason']}")
         
+            
         elif choice == "1":
-           
-            print(f"\n CRÉATION D'UN LIEN PUBLIC...")
-            print(f"  Le terminal sera bloqué pendant l'exécution")
-            print(f"   Appuyez sur Ctrl+C pour arrêter le serveur")
-            print(f"   Le lien sera valide 72 heures\n")
+          
+            print(f"\n CRÉATION DU LIEN PUBLIC...")
+            print(f" Cela peut prendre 10-30 secondes...")
             
             try:
+                ebug=True
+                demo.queue()  
                 demo.launch(
-                    share=True,
-                    server_name="127.0.0.1",
+                    share=True,          
+                    server_name="0.0.0.0", 
                     server_port=port,
-                    show_error=True
-                    
+                    show_error=True,
+                    debug=True,          
+                    inbrowser=False,    
+                    prevent_thread_lock=False,
+                    quiet=False          
                 )
-            except KeyboardInterrupt:
-                print("\n\n Serveur arrêté par l'utilisateur")
+            except Exception as e:
+                print(f"\n❌ ERREUR lors de la création du lien public:")
+                print(f"   {str(e)}")
+                print(f"\n SOLUTIONS ALTERNATIVES:")
+                print(f"   1. Utilisez le mode LOCAL (option 2)")
+                print(f"   2. Vérifiez votre connexion internet")
+                print(f"   3. Désactivez temporairement votre pare-feu")
+                print(f"   4. Installez la dernière version: pip install --upgrade gradio")
         
         else:
-           
+            
             print(f"\n INTERFACE LOCALE")
-            print(f"   Disponible sur: http://localhost:{port}")
-            print(f"   Appuyez sur Ctrl+C pour arrêter\n")
+            print(f" URL: http://localhost:{port}")
+            print(f" URL réseau: http://127.0.0.1:{port}")
+            print(f"  Appuyez sur Ctrl+C pour arrêter\n")
             
             try:
                 demo.launch(
-                    share=False,
+                    share=False,         
                     server_name="127.0.0.1",
                     server_port=port,
-                    show_error=True
-                   
+                    show_error=True,
+                    inbrowser=True      
                 )
             except KeyboardInterrupt:
-                print("\nInterface arrêtée")
+                print("\n\n Interface arrêtée")
     
     except KeyboardInterrupt:
-        print("\n\n Opération annulée par l'utilisateur")
+        print("\n\n Opération annulée")
     except Exception as e:
-        print(f"\n⚠️  Erreur: {e}")
+        print(f"\n⚠️ Erreur: {e}")

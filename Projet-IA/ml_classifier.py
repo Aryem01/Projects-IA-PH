@@ -32,10 +32,10 @@ class MLClassifier:
         self.language = language
         self.administrative_boost = administrative_boost
         
-        # Configuration des stopwords
         stop_words = self._get_stopwords(language)
         
-        # Pipeline ML
+        
+        
         self.pipeline = Pipeline([
             ('tfidf', TfidfVectorizer(
                 max_features=max_features,
@@ -50,12 +50,12 @@ class MLClassifier:
             ('classifier', MultinomialNB(alpha=alpha))
         ])
         
-        # État du modèle
+        
         self.is_trained = False
         self.training_info = {}
         self.class_names = ['legitimate', 'spam']
         
-        # Patterns administratifs pour override
+       
         self.administrative_patterns = self._initialize_administrative_patterns()
     
     def _initialize_administrative_patterns(self) -> Dict[str, Any]:
@@ -100,7 +100,7 @@ class MLClassifier:
         if language == 'english':
             return 'english'
         elif language == 'french':
-            # Liste étendue de stopwords français (éviter suppression de mots importants)
+            # Liste étendue de stopwords français 
             french_stopwords = {
                 # Articles
                 'le', 'la', 'les', 'l', 'un', 'une', 'des', 'du', 'de',
@@ -141,14 +141,13 @@ class MLClassifier:
         if not text or not isinstance(text, str):
             return ""
         
-        # 1. Minuscules
+  
         text = text.lower()
         
         if advanced:
-            # 2. PROTECTION DES PATTERNS ADMINISTRATIFS - NOUVEAU
-            # Remplacer par tokens spéciaux avant tout autre traitement
+          
             protective_patterns = {
-                # Expressions administratives complètes
+              
                 'suivi de votre demande': ' LEGIT_FOLLOWUP_REQUEST ',
                 'prise en charge par notre service': ' LEGIT_SERVICE_HANDLING ',
                 'retour vous sera communiqué': ' LEGIT_RESPONSE_PROMISE ',
@@ -158,17 +157,17 @@ class MLClassifier:
                 'bonne réception': ' LEGIT_ACKNOWLEDGMENT ',
                 'accusons réception': ' LEGIT_FORMAL_ACKNOWLEDGMENT ',
                 
-                # Salutations professionnelles
+               
                 'cordialement': ' PROFESSIONAL_SIGNATURE ',
                 'bien cordialement': ' PROFESSIONAL_SIGNATURE_WARM ',
                 'veuillez agréer': ' PROFESSIONAL_CLOSING ',
                 
-                # Références légitimes
+             
                 'référence numéro': ' LEGIT_REFERENCE_NUMBER ',
                 'numéro de dossier': ' LEGIT_CASE_NUMBER ',
                 'numéro de ticket': ' LEGIT_TICKET_NUMBER ',
                 
-                # Communications professionnelles
+               
                 'pour toute information complémentaire': ' PROFESSIONAL_OFFER_ASSISTANCE ',
                 'nous restons à votre disposition': ' PROFESSIONAL_AVAILABILITY ',
             }
@@ -176,7 +175,8 @@ class MLClassifier:
             for pattern, token in protective_patterns.items():
                 text = text.replace(pattern, token)
             
-            # 3. Mots administratifs importants (garder comme features)
+          
+            
             important_words = {
                 'service': ' SERVICE_TERM ',
                 'administratif': ' ADMINISTRATIVE_TERM ',
@@ -192,26 +192,24 @@ class MLClassifier:
             for word, token in important_words.items():
                 text = re.sub(r'\b' + word + r'\b', token, text)
             
-            # 4. URLs suspectes vs légitimes
-            # Garder les URLs raccourcies comme suspectes
+           
             text = re.sub(r'bit\.ly/\S+|tinyurl\.com/\S+|goo\.gl/\S+', ' SUSPICIOUS_SHORTURL ', text)
             text = re.sub(r'https?://\S+|www\.\S+', ' GENERIC_URL ', text)
             
-            # 5. Emails
+           
             text = re.sub(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', ' EMAIL_ADDRESS ', text)
             
-            # 6. Références et numéros - IMPORTANT pour légitimité
-            # Numéros de référence (longs = probablement légitimes)
+           
             text = re.sub(r'\b\d{6,}\b', ' LONG_NUMBER_REF ', text)
-            # Codes avec lettres/chiffres
+            
             text = re.sub(r'\b[A-Z]{2,}\d{3,}\b', ' CODE_REFERENCE ', text)
             text = re.sub(r'\b\d{3,}[A-Z]{2,}\b', ' CODE_REFERENCE ', text)
             
-            # 7. Montants d'argent - différencier petits/gros montants
-            text = re.sub(r'[\$€£]\s*\d{5,}', ' LARGE_MONEY_AMOUNT ', text)  # Gros montants = spam
-            text = re.sub(r'[\$€£]\s*\d{1,4}', ' SMALL_MONEY_AMOUNT ', text)  # Petits montants = neutre
             
-            # 8. Menaces et urgence
+            text = re.sub(r'[\$€£]\s*\d{5,}', ' LARGE_MONEY_AMOUNT ', text)  
+            text = re.sub(r'[\$€£]\s*\d{1,4}', ' SMALL_MONEY_AMOUNT ', text)  
+            
+           
             threat_indicators = {
                 'urgent': ' URGENCY_INDICATOR ',
                 'immédiat': ' IMMEDIACY_INDICATOR ',
@@ -224,7 +222,7 @@ class MLClassifier:
             for indicator, token in threat_indicators.items():
                 text = re.sub(r'\b' + indicator + r'\b', token, text)
             
-            # 9. Phishing indicators
+            
             phishing_tokens = {
                 '👉': ' LINK_ARROW_INDICATOR ',
                 '🔗': ' LINK_CHAIN_INDICATOR ',
@@ -239,23 +237,23 @@ class MLClassifier:
             for indicator, token in phishing_tokens.items():
                 text = text.replace(indicator, token)
             
-            # 10. Ponctuation excessive - plus tolérant
-            text = re.sub(r'([!?.]){4,}', r'\1\1\1', text)  # Max 3 répétitions
+           
+            text = re.sub(r'([!?.]){4,}', r'\1\1\1', text)  
             
-            # 11. Caractères spéciaux - garder ponctuation française
+          
             text = re.sub(r'[^\w\s.!?,;:àâäæçéèêëïîôùûüÿœÀÂÄÆÇÉÈÊËÏÎÔÙÛÜŸ]', ' ', text)
             
-            # 12. Structure detection - ajouter des tokens pour structure professionnelle
+
             if re.search(r'bonjour.*cordialement', text, re.DOTALL):
                 text += ' PROFESSIONAL_EMAIL_STRUCTURE '
             
             if re.search(r'madame.*monsieur', text, re.DOTALL):
                 text += ' FORMAL_ADDRESS_STRUCTURE '
             
-            # 13. Espaces multiples
+           
             text = re.sub(r'\s+', ' ', text)
             
-            # 14. Garder les mots courts importants pour contexte
+           
             words = text.split()
             important_short_words = {'a', 'i', 'y', 'à', 'ou', 'et', 'or', 'of', 'in', 'to', 'de', 'la', 'le'}
             words = [w for w in words if len(w) > 1 or w in important_short_words]
@@ -270,12 +268,12 @@ class MLClassifier:
         """
         email_lower = email_text.lower()
         
-        # 1. Vérifier les indicateurs clairs
+      
         for indicator in self.administrative_patterns['clear_indicators']:
             if indicator in email_lower:
                 return True
         
-        # 2. Vérifier la structure
+     
         structure_score = 0
         for pattern, points in self.administrative_patterns['structure_patterns']:
             if re.search(pattern, email_lower, re.DOTALL):
@@ -284,7 +282,7 @@ class MLClassifier:
         if structure_score >= 1.0:
             return True
         
-        # 3. Vérifier le contenu professionnel
+        
         content_keywords_found = 0
         for keyword in self.administrative_patterns['content_keywords']:
             if keyword in email_lower:
@@ -295,7 +293,7 @@ class MLClassifier:
             if phrase in email_lower:
                 professional_phrases_found += 1
         
-        # Règles de décision
+       
         if content_keywords_found >= 5 and professional_phrases_found >= 1:
             return True
         
@@ -312,7 +310,7 @@ class MLClassifier:
         email_lower = email_text.lower()
         score = 0.0
         
-        # 1. Structure et formalisme (max 1.0)
+      
         if re.search(r'^bonjour', email_lower):
             score += 0.2
         if re.search(r'cordialement$', email_lower) or re.search(r'cordialement\s*$', email_lower):
@@ -322,19 +320,19 @@ class MLClassifier:
         if re.search(r'cher.*client', email_lower):
             score += 0.3
         
-        # 2. Contenu professionnel (max 1.0)
+       
         professional_terms = ['service', 'administratif', 'client', 'demande', 'traitement', 
                             'dossier', 'référence', 'facture', 'devis', 'contrat']
         term_count = sum(1 for term in professional_terms if term in email_lower)
         score += min(1.0, term_count * 0.15)
         
-        # 3. Références concrètes (max 0.5)
-        if re.search(r'\b#?\d{4,}\b', email_lower):  # Numéros longs
+       
+        if re.search(r'\b#?\d{4,}\b', email_lower):  
             score += 0.3
-        if re.search(r'\b[A-Z]{2,}\d{3,}\b|\b\d{3,}[A-Z]{2,}\b', email_lower):  # Codes
+        if re.search(r'\b[A-Z]{2,}\d{3,}\b|\b\d{3,}[A-Z]{2,}\b', email_lower):  
             score += 0.2
         
-        # 4. Phrases complètes professionnelles (max 0.5)
+      
         professional_phrases = [
             'en cours de traitement',
             'prise en charge',
@@ -359,7 +357,7 @@ class MLClassifier:
         if len(X_train) != len(y_train):
             raise ValueError(f"X_train ({len(X_train)}) et y_train ({len(y_train)}) doivent avoir la même taille")
         
-        # Statistiques
+     
         spam_count = sum(y_train)
         ham_count = len(y_train) - spam_count
         
@@ -367,29 +365,29 @@ class MLClassifier:
         print(f"  • Légitimes: {ham_count}, Spams: {spam_count}")
         print(f"  • Ratio spam: {spam_count/len(y_train):.1%}")
         
-        # Prétraitement
+        
         print("   Prétraitement des textes...")
         X_train_processed = [self.preprocess_text(text) for text in X_train]
         
-        # Filtrer les textes vides
+       
         valid_indices = [i for i, text in enumerate(X_train_processed) if text.strip()]
         X_train_processed = [X_train_processed[i] for i in valid_indices]
         y_train = [y_train[i] for i in valid_indices]
         
         print(f"  • Textes valides après prétraitement: {len(X_train_processed)}")
         
-        # Entraînement
+       
         print("   Entraînement du modèle Naive Bayes...")
         self.pipeline.fit(X_train_processed, y_train)
         self.is_trained = True
         
-        # Métriques
+     
         train_predictions = self.pipeline.predict(X_train_processed)
         train_accuracy = np.mean(train_predictions == y_train)
         
         training_time = time.time() - start_time
         
-        # Informations
+       
         self.training_info = {
             'train_size': len(X_train_processed),
             'train_accuracy': train_accuracy,
@@ -410,7 +408,7 @@ class MLClassifier:
             }
         }
         
-        # Validation
+      
         if X_val is not None and y_val is not None:
             X_val_processed = [self.preprocess_text(text) for text in X_val]
             val_predictions = self.pipeline.predict(X_val_processed)
@@ -438,30 +436,30 @@ class MLClassifier:
         if not self.is_trained:
             raise Exception("Le modèle doit être entraîné avant de prédire")
         
-        # 1. Vérifier si c'est clairement administratif (OVERRIDE)
+       
         if apply_administrative_boost and self._is_clearly_administrative(email_text):
-            return False, 0.1  # Forcer légitime avec très faible probabilité spam
+            return False, 0.1  
         
-        # 2. Prétraitement
+    
         processed_text = self.preprocess_text(email_text)
         
         if not processed_text.strip():
             return False, 0.0
         
-        # 3. Prédiction ML standard
+      
         prediction = self.pipeline.predict([processed_text])[0]
         probabilities = self.pipeline.predict_proba([processed_text])[0]
         spam_probability = probabilities[1]
         
-        # 4. Ajustement basé sur le score administratif
+       
         if apply_administrative_boost:
             admin_score = self._calculate_administrative_score(email_text)
             if admin_score > 0:
-                # Réduire la probabilité spam proportionnellement au score
+             
                 reduction = min(self.administrative_boost, admin_score * 0.15)
                 adjusted_prob = max(0.0, spam_probability - reduction)
                 
-                # Re-décision si probabilité ajustée < 50%
+                
                 if adjusted_prob < 0.5:
                     return False, adjusted_prob
                 else:
@@ -473,17 +471,17 @@ class MLClassifier:
         """
         Prédiction avec explication détaillée pour débogage
         """
-        # Vérification administrative
+       
         is_clearly_admin = self._is_clearly_administrative(email_text)
         admin_score = self._calculate_administrative_score(email_text)
         
-        # Prédiction brute
+    
         raw_prediction, raw_probability = self.predict(email_text, apply_administrative_boost=False)
         
-        # Prédiction ajustée
+    
         final_prediction, final_probability = self.predict(email_text, apply_administrative_boost=True)
         
-        # Texte prétraité pour analyse
+       
         processed_text = self.preprocess_text(email_text)
         
         explanation = {
@@ -608,39 +606,39 @@ class MLClassifier:
         except Exception as e:
             raise Exception(f"Erreur lors du chargement: {e}")
 
-# Fonction utilitaire pour le système principal
+
 def create_french_friendly_classifier() -> MLClassifier:
     """Crée un classifieur optimisé pour le français avec détection administrative"""
     return MLClassifier(
-        max_features=4000,  # Plus de features pour le français
-        ngram_range=(1, 3),  # Inclure trigrams pour phrases françaises
-        alpha=0.05,  # Moins de lissage pour plus de sensibilité
+        max_features=4000, 
+        ngram_range=(1, 3),  
+        alpha=0.05, 
         language='french',
-        administrative_boost=0.4,  # Boost plus fort pour français
+        administrative_boost=0.4,  
     )
 
 
 if __name__ == "__main__":
     print(" Test du classifieur amélioré avec support français administratif...\n")
     
-    # Créer un classifieur optimisé français
+
   
     classifier = MLClassifier(language='french')
-    # Données d'entraînement avec exemples administratifs
+
     X_train = [
-        # Emails administratifs légitimes (HAM = 0)
+       
         "Bonjour, votre demande a bien été prise en charge par notre service. Un retour vous sera communiqué dès finalisation du traitement. Cordialement, Service administratif",
         "Madame, Monsieur, Nous accusons réception de votre dossier numéro 12345. Il est en cours de traitement. Bien cordialement, Service Client",
         "Objet : Suivi de votre demande - Bonjour, nous traitons actuellement votre requête REF-2024-001. Nous vous répondrons dans les meilleurs délais. Cordialement",
         "Suite à votre demande du 15/01/2024, nous vous informons que votre facture F2024001 est en pièce jointe. Pour toute information, contactez notre service. Sincères salutations",
         
-        # Spams évidents (SPAM = 1)
+        
         "GAGNEZ 1000€ MAINTENANT GRATUIT!!! Cliquez bit.ly/arnaque",
         "URGENT: Votre compte a été hacké! Accédez à security-verif.com pour vérifier",
         "WIN $1,000,000 NOW! Limited time offer!!! Click here: tinyurl.com/lottery-scam",
         "Téléchargez virus.exe pour booster votre PC!!! C'est GRATUIT et SÉCURISÉ",
         
-        # Phishing sophistiqué (SPAM = 1)
+       
         "Cher client, une vérification de sécurité est nécessaire pour votre compte. Accédez à mon-espace-securise.com pour éviter la suspension. Service Assistance",
         "Notification importante: Votre compte nécessite une mise à jour. Cliquez 👉 lien-verif.com pour sécuriser vos informations. Équipe Support",
     ]
@@ -657,19 +655,19 @@ if __name__ == "__main__":
     print("="*80)
     
     test_emails = [
-        # 1. Email administratif légitime (DEVRAIT ÊTRE HAM)
+       
         ("Suivi de votre demande\n\nBonjour,\n\nVotre demande a bien été prise en charge par notre service.\nUn retour vous sera communiqué dès finalisation du traitement.\n\nCordialement,\nService administratif", False),
         
-        # 2. Spam violent (DEVRAIT ÊTRE SPAM)
+        
         ("give me money or i will kill you", True),
         
-        # 3. Email professionnel légitime
+       
         ("Bonjour Madame Dupont,\n\nVotre dossier #45678 est en traitement.\nNous vous contacterons pour toute information complémentaire.\n\nBien cordialement,\nService Clientèle", False),
         
-        # 4. Phishing sophistiqué
+       
         ("Cher utilisateur, votre compte nécessite une vérification immédiate. Accédez à vérification-compte.com pour éviter la limitation de vos fonctionnalités. Service de Sécurité", True),
         
-        # 5. Email de facturation légitime
+      
         ("Madame, Monsieur,\n\nVeuillez trouver ci-joint la facture n°F2024002.\nDate d'échéance: 30/01/2024.\n\nPour tout renseignement, contactez notre service comptabilité.\n\nVeuillez agréer nos salutations distinguées.", False),
     ]
     
@@ -681,7 +679,7 @@ if __name__ == "__main__":
         print(f"Type attendu: {'🚫 SPAM' if expected else '✅ LÉGIT'}")
         print(f"Email: {email[:80]}...")
         
-        # Prédiction avec explication
+        
         explanation = classifier.predict_with_explanation(email)
         is_spam = explanation['final_prediction']
         probability = explanation['final_probability']
@@ -692,7 +690,7 @@ if __name__ == "__main__":
         
         print(f"Résultat: {status} {'🚫 SPAM' if is_spam else '✅ LÉGIT'} (prob: {probability:.1%})")
         
-        # Détails pour débogage
+       
         if explanation['is_clearly_administrative']:
             print(f"  → Détecté comme clairement administratif (OVERRIDE)")
         elif explanation['administrative_score'] > 0:
@@ -706,7 +704,7 @@ if __name__ == "__main__":
     print(f"RÉSULTATS FINAUX: {correct_predictions}/{total_tests} corrects ({correct_predictions/total_tests:.1%})")
     print("="*80)
     
-    # Test spécifique de votre email problématique
+   
     print("\n" + "="*80)
     print("TEST SPÉCIFIQUE DE L'EMAIL PROBLÉMATIQUE:")
     print("="*80)

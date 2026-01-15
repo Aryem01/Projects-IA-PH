@@ -24,7 +24,7 @@ class HybridSpamFilter:
         self.use_cache = use_cache
         self.language = language
         
-        # Statistiques
+      
         self.stats = {
             'total_processed': 0,
             'blocked_by_rules': 0,
@@ -32,8 +32,7 @@ class HybridSpamFilter:
             'legitimate': 0,
             'processing_times': [],
         }
-        
-        # Cache
+       
         if self.use_cache:
             self.cache = {}
             self.cache_hits = 0
@@ -55,13 +54,13 @@ class HybridSpamFilter:
         """
         Classifie un email (VERSION OPTIMISÉE)
         """
-        # Validation
+       
         if not email_text or not isinstance(email_text, str):
             raise ValueError("L'email doit être une chaîne non vide")
         
         email_text = email_text.strip()
         
-        # Cache
+       
         cache_key = None
         if self.use_cache:
             cache_key = hash(email_text)
@@ -70,7 +69,7 @@ class HybridSpamFilter:
                 return self.cache[cache_key]
             self.cache_misses += 1
         
-        # Email très court
+       
         if len(email_text) < 10:
             result = {
                 'is_spam': False,
@@ -87,7 +86,7 @@ class HybridSpamFilter:
         start_time = time.time()
         self.stats['total_processed'] += 1
         
-        # ÉTAPE 1: Règles heuristiques (priorité)
+       
         is_spam_rules, reason_rules = self.heuristic_rules.apply_rules(email_text)
         
         if is_spam_rules:
@@ -110,7 +109,7 @@ class HybridSpamFilter:
             
             return result
         
-        # ÉTAPE 2: Machine Learning
+       
         if not self.ml_classifier.is_trained:
             raise Exception("Le modèle ML doit être entraîné")
         
@@ -258,10 +257,10 @@ def create_spam_filter(threshold: float = 0.65, language: str = 'french') -> Hyb
 if __name__ == "__main__":
     print(" Test du système hybride optimisé...\n")
     
-    # Créer un filtre français
+    
     spam_filter = HybridSpamFilter(ml_threshold=0.65, language='french')
     
-    # Test basique (sans entraînement ML)
+  
     test_emails = [
         "URGENT!!! Téléchargez virus.exe bit.ly/xxx",
         "Bonjour, voici le rapport demandé",
@@ -269,7 +268,7 @@ if __name__ == "__main__":
     
     print(" Tests avec règles heuristiques uniquement:\n")
     for email in test_emails:
-        # Simuler juste les règles
+       
         is_spam, reason = spam_filter.heuristic_rules.apply_rules(email)
         status = "🚫 SPAM" if is_spam else "✅ LÉGIT"
         print(f"{status}: {email[:50]}...")

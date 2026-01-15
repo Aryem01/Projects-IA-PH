@@ -44,14 +44,14 @@ def quick_test_100_emails(seuil=0.5):
     dm = DatasetManager()
     X, y, _ = dm.load_dataset()
     
-    # Prendre exactement 100 emails
+   
     X_test = X[:100]
     y_test = y[:100]
     
   
     spam_filter = HybridSpamFilter(ml_threshold=seuil)
     
-    # Entraînement rapide
+
     print("Entraînement rapide du modèle...")
     spam_filter.train_ml_model(X[:200], y[:200])
     
@@ -64,7 +64,7 @@ def quick_test_100_emails(seuil=0.5):
     print(f"  • Détection spam: {results['recall']:.2%}")
     print(f"  • Précision globale: {results['accuracy']:.2%}")
     
-    # Objectifs du projet
+    
     fp_ok = results['false_positive_rate'] < 0.01
     recall_ok = results['recall'] > 0.95
     
@@ -86,11 +86,11 @@ def main():
     print(f"• Test rapide: {' OUI' if args.test_rapide else ' NON'}")
     print("="*60)
     
-    # Si test rapide demandé
+
     if args.test_rapide:
         return quick_test_100_emails(seuil=args.seuil)
     
-    # Si mode interactif
+ 
     if args.mode == 'test':
         test_custom_emails()
         return
@@ -130,7 +130,7 @@ def main():
     data_load_time = time.time() - start_time
     print(f"\nDonnées préparées! ({data_load_time:.1f}s)")
     
-    # ANALYSE DU DATASET
+   
     print("\n ANALYSE DU DATASET")
     print("-" * 80)
     
@@ -143,7 +143,7 @@ def main():
     print(f"   -Ensemble de test: {len(X_test)}")
     print(f"   -Ratio spam/légitime: {total_spam/total_emails:.1%}/{total_ham/total_emails:.1%}")
     
-    # Exemples
+ 
     print(f"\nExemple légitime (Enron):")
     ham_idx = next((i for i, label in enumerate(y_train) if label == 0), 0)
     print(f"     \"{X_train[ham_idx][:80]}...\"")
@@ -190,7 +190,7 @@ def main():
         print(f"   Raison: {result['reason']}")
         print()
     
-    # Réinitialiser stats avant évaluation
+    
     spam_filter.reset_statistics()
     
     print("\n ÉTAPE 4: Évaluation complète sur jeu de test")
@@ -199,7 +199,7 @@ def main():
     evaluator = SpamFilterEvaluator(spam_filter)
     results = evaluator.evaluate(X_test, y_test, verbose=True)
     
-    #   Analyse détaillée des règles si demandé
+    
     if args.afficher_regles:
         print("\n ANALYSE DÉTAILLÉE DES RÈGLES (sur demande)")
         print("-" * 80)
@@ -216,10 +216,10 @@ def main():
     print("\nÉTAPE 5: Analyse des erreurs")
     print("-" * 80)
     
-    # Faux positifs
+    
     false_positives = evaluator.find_false_positives(X_test, y_test, max_display=3)
     
-    # Contribution des règles
+   
     stats = spam_filter.get_statistics()
     if 'rule_triggers' in stats:
         print(f"\n CONTRIBUTION DES RÈGLES HEURISTIQUES:")
@@ -228,7 +228,7 @@ def main():
             for rule_name, count in stats['rule_triggers'].items():
                 if count > 0:
                     percentage = (count / total_rules) * 100
-                    # Traduction française
+                   
                     noms_fr = {
                         'dangerous_attachment': 'Pièce jointe dangereuse',
                         'suspicious_url': 'URL suspecte',
@@ -245,10 +245,10 @@ def main():
     print("\n ÉTAPE 6: Génération des rapports")
     print("-" * 80)
     
-    # Rapport texte
+   
     evaluator.generate_detailed_report('./results/evaluation_report.txt')
     
-    # Sauvegarder le modèle
+  
     model_path = './models/spam_model.pkl'
     spam_filter.ml_classifier.save_model(model_path)
     
@@ -279,7 +279,7 @@ def main():
     else:
         print("\n Détection de spam > 95% - Objectif atteint!")
     
-    # RÉSUMÉ FINAL
+
     
     print(" PROJET TERMINÉ AVEC SUCCÈS!")
     print("="*80)
@@ -318,7 +318,7 @@ def main():
     
     return spam_filter, evaluator, results
 
-#  MODIFIEZ le début de test_custom_emails() pour accepter un seuil
+
 def test_custom_emails(seuil=0.5):
     """Fonction pour tester des emails personnalisés"""
     print("  MODE TEST INTERACTIF")
@@ -407,20 +407,20 @@ if __name__ == "__main__":
     
     print(" Toutes les dépendances sont installées\n")
     
-    # Parse arguments une seule fois
+   
     args = parse_arguments()
     
     try:
         if args.mode == 'test':
             test_custom_emails(seuil=args.seuil)
         elif args.test_rapide:
-            #   test rapide ne retourne pas 3 valeurs
+           
             print("\n" + "="*60)
             print(" TEST RAPIDE  100 EMAILS")
             print("="*60)
             quick_test_100_emails(seuil=args.seuil)
         else:
-            # Mode évaluation complète
+            
             spam_filter, evaluator, results = main()
             
             print("\n Pour d'autres modes:")

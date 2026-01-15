@@ -19,8 +19,8 @@ class DatasetManager:
         self.processed_dir = self.data_dir / 'processed'
         self.processed_dir.mkdir(exist_ok=True)
         
-        # Chemin vers le dataset Enron (maildir dans le même dossier)
-        self.enron_dir = Path('maildir')  # maildir 
+        # Chemin vers le dataset Enron (maildir )
+        self.enron_dir = Path('maildir')  
         
     def _load_real_enron_emails(self, max_emails=800):
         """
@@ -39,11 +39,11 @@ class DatasetManager:
         
         print(f"✓ Dossier Enron trouvé: {self.enron_dir.absolute()}")
         
-        # Dossiers à scanner pour les emails légitimes
+        
         email_folders = ['inbox', 'sent_items', '_sent_mail', 'sent', 'all_documents']
         
         try:
-            # Parcourir tous les dossiers utilisateurs
+           
             user_dirs = [d for d in self.enron_dir.iterdir() if d.is_dir()]
             print(f"  • {len(user_dirs)} dossiers utilisateurs trouvés")
             
@@ -51,33 +51,32 @@ class DatasetManager:
                 for folder in email_folders:
                     folder_path = user_dir / folder
                     if folder_path.exists():
-                        # Compter les fichiers
+                        
                         email_files = list(folder_path.iterdir())
                         if email_files:
                             print(f"  • {user_dir.name}/{folder}: {len(email_files)} fichiers")
                             
-                            # Lire quelques emails de ce dossier
-                            for email_file in email_files[:50]:  # Limiter par dossier
+                            for email_file in email_files[:50]:  
                                 if email_count >= max_emails:
                                     print(f"✓ {email_count} emails Enron chargés")
                                     return legitimate_emails
                                 
                                 try:
-                                    # Lire le fichier email
+                                
                                     with open(email_file, 'rb') as f:
                                         msg = BytesParser(policy=policy.default).parse(f)
                                     
-                                    # Extraire le sujet et le corps
+                                    
                                     subject = msg.get('subject', '')
                                     body = self._extract_email_body(msg)
                                     
-                                    if body and len(body) > 20:  # Email valide
-                                        # Créer un texte d'email réaliste
+                                    if body and len(body) > 20: 
+                                        
                                         email_text = f"Subject: {subject}\n\n{body}"
                                         
                                         legitimate_emails.append({
-                                            'text': email_text[:500],  # Limiter la taille
-                                            'label': 0,  # Ham (légitime)
+                                            'text': email_text[:500], 
+                                            'label': 0,  # Ham 
                                             'type': f'enron_{user_dir.name}',
                                             'source': str(email_file)
                                         })
@@ -87,7 +86,7 @@ class DatasetManager:
                                             print(f"    {email_count} emails chargés...")
                                         
                                 except Exception as e:
-                                    # Passer en cas d'erreur sur un fichier
+                                    
                                     continue
             
         except Exception as e:
@@ -99,7 +98,7 @@ class DatasetManager:
         """Génère des emails spam synthétiques - VERSION CORRIGÉE"""
         print(f"🔧 Génération de {count} emails spam synthétiques...")
         
-        # PONDÉRATION: Plus de phishing sophistiqué (40%)
+        
         phishing_templates = [
             # Phishing sophistiqué anglais
             "Hello, As part of our regular security review, we identified a configuration detail that may require your attention. To avoid any potential service limitations, we recommend reviewing your account settings at your convenience by accessing your personal area below: 👉 Access my account If the review is not completed within the next few days, certain features may be temporarily unavailable until verification is finalized. Thank you for your understanding, Support Services Account Management Team",
@@ -118,7 +117,7 @@ class DatasetManager:
             "Vérification de Compte Requise : Pour garantir la sécurité de votre compte et prévenir tout accès non autorisé, nous avons besoin de confirmer vos informations. Veuillez accéder à votre compte via ce lien : Portail de Vérification. Il s'agit d'un contrôle de sécurité obligatoire. Merci, Département Protection des Comptes",
         ]
         
-        # SPAM traditionnels (60%)
+       
         traditional_spam_templates = [
             # Anglais
             "URGENT!!! Your account will be suspended! Click here bit.ly/urgent to verify: bit.ly/verify123",
@@ -145,11 +144,11 @@ class DatasetManager:
             "Offre exclusive! Travaillez de chez vous et gagnez 5000€ par mois!",
         ]
         
-        # Combiner avec pondération
-        phishing_count = int(count * 0.4)  # 40% phishing
-        traditional_count = count - phishing_count  # 60% spam traditionnel
         
-        # Sélectionner aléatoirement
+        phishing_count = int(count * 0.4)  
+        traditional_count = count - phishing_count  
+        
+        
         emails = []
         for i in range(count):
             if i < phishing_count:
@@ -157,8 +156,7 @@ class DatasetManager:
                 email_type = 'phishing_sophisticated'
             else:
                 text = random.choice(traditional_spam_templates)
-                # ⭐⭐ CORRECTION : Ces lignes DOIVENT ÊTRE DANS LE ELSE
-                # Déterminer sous-type
+               
                 if any(phrase in text.lower() for phrase in ['bit.ly', 'tinyurl', 'goo.gl']):
                     email_type = 'spam_url'
                 elif any(phrase in text.lower() for phrase in ['.exe', '.zip', '.rar']):
@@ -166,22 +164,19 @@ class DatasetManager:
                 else:
                     email_type = 'spam_generic'
             
-            # ⭐⭐ CORRECTION : BIEN AJOUTER À LA LISTE
             emails.append({
                 'text': text,
-                'label': 1,  # TRÈS IMPORTANT : 1 pour SPAM
+                'label': 1,  
                 'type': email_type,
                 'subtype': 'phishing' if 'phishing' in email_type else 'traditional'
             })
-        
-        # Mélanger
+     
         random.shuffle(emails)
-        
-        # Statistiques
+      
         phishing_emails = sum(1 for e in emails if 'phishing' in e['type'])
-        print(f"✅ {phishing_emails} emails de phishing sophistiqué générés")
-        print(f"✅ {count - phishing_emails} emails de spam traditionnel générés")
-        print(f"✅ Total: {len(emails)} spams générés avec succès")
+        print(f" {phishing_emails} emails de phishing sophistiqué générés")
+        print(f"{count - phishing_emails} emails de spam traditionnel générés")
+        print(f" Total: {len(emails)} spams générés avec succès")
         
         return emails
     
@@ -191,7 +186,7 @@ class DatasetManager:
         body = ""
         
         if msg.is_multipart():
-            # Chercher la partie texte
+           
             for part in msg.iter_parts():
                 if part.get_content_type() == 'text/plain':
                     try:
@@ -200,23 +195,23 @@ class DatasetManager:
                     except:
                         continue
         else:
-            # Email simple
+           
             if msg.get_content_type() == 'text/plain':
                 try:
                     body = msg.get_content()
                 except:
                     pass
         
-        # Nettoyer le texte
+       
         if body:
-            # Supprimer les réponses et signatures
+           
             lines = body.split('\n')
             cleaned_lines = []
             for line in lines:
                 if line.startswith('>') or line.startswith('On ') and 'wrote:' in line:
                     break
                 cleaned_lines.append(line)
-            body = '\n'.join(cleaned_lines[:20])  # Garder les premières lignes
+            body = '\n'.join(cleaned_lines[:20])  
         
         return body
     
@@ -277,15 +272,14 @@ class DatasetManager:
             })
         
         return emails
-    # Dans _generate_spam_emails, ajouter ces nouveaux templates :
+    
 
     compliance_phishing_templates = [
-     # Phishing conformité français
+ 
      "Bonjour, Dans le cadre de nos contrôles périodiques de conformité, un point administratif concernant votre profil a été signalé comme nécessitant une vérification complémentaire. Aucune action urgente n'est requise à ce stade. Toutefois, afin d'éviter toute mesure automatique liée à la politique de conformité, nous vous recommandons de consulter votre espace utilisateur lors de votre prochaine connexion. 👉 Accéder à l'espace utilisateur À défaut de consultation, certaines fonctionnalités pourraient être ajustées temporairement conformément aux procédures en vigueur. Cordialement, Cellule conformité Services numériques",
     
      "Objet : Mise à jour de conformité requise Cher utilisateur, Suite à une révision de nos normes de conformité, votre profil nécessite une actualisation. Bien qu'aucune action immédiate ne soit exigée, nous vous invitons à procéder à la mise à jour dans les meilleurs délais pour prévenir toute restriction automatique. 👉 Accéder au portail de conformité En l'absence de mise à jour, l'accès à certaines fonctionnalités pourrait être progressivement limité. Respectueusement, Service Conformité Digitale",
-    
-     # Phishing conformité anglais
+
      "Hello, As part of our periodic compliance checks, an administrative point regarding your profile has been flagged as requiring additional verification. No urgent action is required at this stage. However, to avoid any automatic measures related to the compliance policy, we recommend consulting your user space during your next login. 👉 Access user space Without consultation, some features could be temporarily adjusted according to current procedures. Best regards, Compliance Cell Digital Services",
     
      "Subject: Compliance Update Required Dear user, Following a review of our compliance standards, your profile requires updating. While no immediate action is demanded, we invite you to proceed with the update promptly to prevent any automatic restrictions. 👉 Access compliance portal In the absence of an update, access to certain features may be gradually limited. Respectfully, Digital Compliance Service",
@@ -299,11 +293,11 @@ class DatasetManager:
         """
         print("\n Création du dataset hybride...")
         
-        # Étape 1: Charger les vrais emails Enron
+        
         legitimate_emails = self._load_real_enron_emails(max_emails=800)
         
-        # Étape 2: Si pas assez d'emails Enron, compléter avec des synthétiques
-        if len(legitimate_emails) < 400:  # Moins de 400 emails réels
+        
+        if len(legitimate_emails) < 400:  
             print(f" Seulement {len(legitimate_emails)} emails Enron trouvés")
             needed = 800 - len(legitimate_emails)
             print(f"   Ajout de {needed} emails légitimes synthétiques...")
@@ -312,19 +306,17 @@ class DatasetManager:
         else:
             print(f" {len(legitimate_emails)} emails légitimes chargés (vrais Enron)")
         
-        # Étape 3: Générer les spams - AUGMENTÉ DE 200 À 400
+        # Générer les spams - AUGMENTÉ DE 200 À 400
         spam_emails = self._generate_spam_emails(400)  
         
-        # Étape 4: Combiner et mélanger
+   
         all_emails = legitimate_emails + spam_emails
         random.shuffle(all_emails)
         
-        # Étape 5: Sauvegarder
         df = pd.DataFrame(all_emails)
         output_file = self.processed_dir / 'enron_hybrid_dataset.csv'
         df.to_csv(output_file, index=False)
         
-        # Statistiques
         enron_count = sum(1 for e in all_emails if 'enron' in str(e.get('type', '')))
         synthetic_count = len(all_emails) - enron_count - len(spam_emails)
         
@@ -336,7 +328,7 @@ class DatasetManager:
         print(f"     • Spams synthétiques: {len(spam_emails)}")
         print(f"     • Ratio spam: {len(spam_emails)/len(all_emails):.1%}")
         
-        # Afficher quelques exemples
+
         print(f"\n   Exemples:")
         for i, email_data in enumerate(all_emails[:3], 1):
             email_type = email_data['type']
@@ -375,7 +367,7 @@ class DatasetManager:
         print(f"  • Train: {len(X_train)} emails")
         print(f"  • Test: {len(X_test)} emails")
         
-        # Analyse de la distribution
+ 
         train_spam = sum(y_train)
         train_ham = len(y_train) - train_spam
         test_spam = sum(y_test)
@@ -406,7 +398,7 @@ class DatasetManager:
             return {}
 
 
-# Test du dataset manager
+
 if __name__ == "__main__":
     print(" Test du DatasetManager avec maildir...")
     
@@ -435,8 +427,6 @@ if __name__ == "__main__":
         print("   Création d'un dataset entièrement synthétique...")
         dm.download_enron_dataset()
     
-    # Charger et splitter le dataset
+
     print("\n\n Chargement et split du dataset...")
     X_train, X_test, y_train, y_test = dm.get_train_test_split()
-
-

@@ -7,14 +7,14 @@ import re
 
 class HeuristicRules:
     def __init__(self):
-        # 1. EXTENSIONS DANGEREUSES
+   
         self.dangerous_extensions = [
             '.exe', '.bat', '.cmd', '.com', '.pif', '.scr',
             '.vbs', '.js', '.jar', '.msi', '.dmg', '.app', '.apk',
             '.vbe', '.jse', '.wsf', '.hta', '.lnk',
         ]
         
-        # 2. URLs SUSPECTES (raccourcisseurs)
+       
         self.suspicious_url_patterns = [
             r'bit\.ly/', r'tinyurl\.com/', r'goo\.gl/',
             r't\.co/', r'ow\.ly/', r'is\.gd/', r'cli\.gs/',
@@ -22,28 +22,28 @@ class HeuristicRules:
             r'short\.ly/', r'cutt\.ly/', r'shorturl\.at/',
         ]
         
-        # 3. MOTS-CLÉS SPAM - AUGMENTÉ pour menaces violentes
+        
         self.spam_keywords =[
-            # Gains / Argent (forte suspicion)
+           
             'win money', 'free money', 'gagner argent', 'argent gratuit',
             'cash prize', 'lottery winner', 'gagnant loterie',
             'claim prize', 'réclamer prix', 'winner selected',
             
-            # Urgence extrême
+            
             'act now', 'click now', 'limited time', 'expire today',
             'maintenant', 'urgent action', 'dernière chance',
             'expires today', 'expire demain', 'action immédiate',
             
-            # Menaces directes
+           
             'account suspended', 'compte suspendu', 'compte bloqué',
             'account blocked', 'will be closed', 'sera fermé',
             
-            # Spam évident
+          
             'congratulations winner', 'félicitations gagnant',
             'you won', 'vous avez gagné', 'selected winner',
             'free iphone', 'iphone gratuit', 'free gift',
             
-            # Phishing sophistiqué
+           
             'activité inhabituelle', 'unusual activity', 'suspicious activity',
             'vérifier vos informations', 'verify your information', 'verify account',
             'accéder à mon espace', 'access your account', 'login to verify',
@@ -52,7 +52,7 @@ class HeuristicRules:
             'sous 48 heures', 'within 48 hours', 'dans les 24 heures',
             'action requise', 'action required', 'immediate action',
             
-            # Phrases de phishing sophistiqué
+           
             'regular security review', 'vérifications régulières',
             'configuration detail', 'paramétrage de votre compte',
             'service limitations', 'limitation temporaire',
@@ -62,7 +62,7 @@ class HeuristicRules:
             'support services', 'service assistance',
             'account management', 'gestion des comptes',
             
-            # Phishing indirect/soft
+            
             'contrôles périodiques',
             'point administratif',
             'vérification complémentaire',
@@ -82,7 +82,7 @@ class HeuristicRules:
             'compliance cell',
             'digital services',
             
-            # Phishing indirect - phrases courtes
+            
             'vérification de compte',
             'compte nécessaire',
             'validation requise',
@@ -98,7 +98,7 @@ class HeuristicRules:
             'cher client',
             'cher utilisateur',
             
-            # MENACES VIOLENTES - NOUVEAU
+           
             'kill you', 'i will kill', 'je vais tuer',
             'hurt you', 'i will hurt', 'je vais blesser',
             'attack you', 'i will attack', 'je vais attaquer',
@@ -116,7 +116,7 @@ class HeuristicRules:
             'going to kill', 'vais tuer', 'going to hurt', 'vais blesser',
         ]
         
-        # 4. MOTS LÉGITIMES FRANÇAIS - AMÉLIORÉ
+        
         self.french_legitimate_patterns = [
             'bonne réception', 'accusons réception', 'en cours de traitement',
             'cordialement', 'bien cordialement', 'veuillez agréer',
@@ -127,11 +127,11 @@ class HeuristicRules:
             'nous vous informons', 'suite à votre demande',
             'objet : suivi', 'votre demande', 'ticket #',
             'référence', 'case #', 'numéro de dossier',
-            'facture', 'devis', 'commande', 'contrat',  # Documents légitimes
-            'réunion', 'meeting', 'appel', 'conférence',  # Communications
-            'rapport', 'présentation', 'analyse', 'budget',  # Travail
+            'facture', 'devis', 'commande', 'contrat', 
+            'réunion', 'meeting', 'appel', 'conférence',  
+            'rapport', 'présentation', 'analyse', 'budget',  
             
-            # NOUVEAUX PATTERNS AJOUTÉS
+    
             'suivi de votre demande', 'prise en charge',
             'finalisation du traitement', 'bien été prise en charge',
             'vous sera communiqué', 'retour vous sera communiqué',
@@ -145,9 +145,9 @@ class HeuristicRules:
             'en copie', 'cc :', 'c.c :',
         ]
         
-        # 5. PATTERNS DE MENACES - AUGMENTÉ pour menaces violentes
+       
         self.threat_patterns = [
-            # Menaces directes
+           
             r'sinon\s+(nous|je|on)\s+(bloqu|ferm|supprim)',
             r'if\s+you\s+don\'?t.*?(suspend|block|close)',
             r'compte\s+(sera|va être)\s+(fermé|bloqué|suspendu)',
@@ -157,7 +157,7 @@ class HeuristicRules:
             r'dernier\s+(avertissement|rappel|delai)',
             r'final\s+(warning|notice|reminder)',
             
-            # Menaces indirectes (phishing)
+            
             r'sans\s+action.*?(sous|dans|avant).*?(heure|jour)',
             r'(without|unless).*?action.*?(hour|day)',
             r'fonctionnalités?\s+(seront?|pourrai(en)?t\s+être)\s+(limitées?|restreintes?|bloquées?)',
@@ -165,7 +165,7 @@ class HeuristicRules:
             r'éviter.*?(interruption|suspension|blocage)',
             r'(avoid|prevent).*?(interruption|suspension|closure)',
             
-            # Phrases de phishing conformité
+            
             r'afin d\'éviter toute mesure automatique',
             r'to avoid any automatic measures',
             r'pourraient être ajustées temporairement',
@@ -175,7 +175,7 @@ class HeuristicRules:
             r'à défaut de consultation',
             r'without consultation',
             
-            # MENACES VIOLENTES - NOUVEAU
+           
             r'i will\s+(kill|hurt|harm|attack|destroy)\s+you',
             r'je vais\s+(tuer|blesser|nuire|attaquer|détruire)\s+(toi|vous)',
             r'if you don\'t\s+.*?\s+i will',
@@ -193,7 +193,7 @@ class HeuristicRules:
             r'you will\s+(regret|suffer|die)',
             r'tu vas\s+(regretter|souffrir|mourir)',
             
-            # Extorsion avec menace
+          
             r'give me (money|cash|argent|bitcoin) or',
             r'donne moi (argent|bitcoin|monnaie) ou',
             r'send me (money|funds) or else',
@@ -206,9 +206,8 @@ class HeuristicRules:
             r'envoie.*?ou je vais.*?(tuer|blesser)',
         ]
         
-        # 6. PATTERNS PHRASING INDIRECT
         self.indirect_phishing_patterns = [
-            # Phrases qui semblent innocentes mais sont du phishing
+            
             r'vérification\s+(de\s+)?(votre\s+)?compte\s+(est\s+)?(nécessaire|requise|obligatoire)',
             r'validation\s+(de\s+)?(votre\s+)?compte\s+(est\s+)?(nécessaire|requise)',
             r'mise\s+à\s+jour\s+(de\s+)?(vos\s+)?informations',
@@ -221,51 +220,50 @@ class HeuristicRules:
             r'mesures\s+(sont\s+)?(nécessaires|requises|obligatoires)',
             r'étapes\s+(sont\s+)?(à\s+suivre|requises|nécessaires)',
             
-            # Appels génériques
+            
             r'cher\s+(client|utilisateur|membre|abonné)',
             r'dear\s+(customer|user|member|subscriber)',
             
-            # Sans détails spécifiques
+            
             r'pour\s+(des\s+)?raisons\s+(de\s+)?sécurité',
             r'for\s+security\s+reasons',
             r'afin\s+de\s+(protéger|sécuriser)\s+votre\s+compte',
             r'to\s+(protect|secure)\s+your\s+account',
         ]
         
-        # 7. PATTERNS DE MENACES VIOLENTES SPÉCIFIQUES
+       
         self.violent_threat_patterns = [
-            # Menaces de mort explicites
+           
             r'\bkill\s+(you|u|ya)\b',
             r'\btuer\s+(toi|vous)\b',
             r'\bmurder\s+(you|him|her)\b',
             r'\bassassin(er)?\s+(toi|vous)\b',
             
-            # Menaces de violence
+     
             r'\bhurt\s+(you|u)\b',
             r'\bblesser\s+(toi|vous)\b',
             r'\battack\s+(you|u)\b',
             r'\battaquer\s+(toi|vous)\b',
             
-            # Structure conditionnelle menaçante
+           
             r'if\s+.*?\s+(don\'t|do not)\s+.*?\s+(kill|hurt|harm)',
             r'si\s+.*?\s+(ne|n\')\s+.*?\s+(tuer|blesser|nuire)',
             r'unless\s+.*?\s+(kill|hurt|harm)',
             r'\à\s+moins\s+que\s+.*?\s+(tuer|blesser|nuire)',
             
-            # Extorsion violente
             r'give\s+.*?\s+or\s+.*?\s+(kill|hurt|harm)',
             r'donne\s+.*?\s+ou\s+.*?\s+(tuer|blesser|nuire)',
             r'pay\s+.*?\s+or\s+.*?\s+(kill|hurt)',
             r'paye\s+.*?\s+ou\s+.*?\s+(tuer|blesser)',
             
-            # Conséquences violentes
+            
             r'you will\s+(die|suffer|regret)',
             r'tu vas\s+(mourir|souffrir|regretter)',
             r'bad things\s+will\s+happen',
             r'il va\s+(t\'arriver|vous arriver)\s+malheur',
         ]
         
-        # 8. STATISTIQUES DES RÈGLES
+      
         self.rule_triggers = {
             'dangerous_attachment': 0,
             'suspicious_url': 0,
@@ -278,10 +276,9 @@ class HeuristicRules:
             'phishing_indirect': 0,
             'short_suspicious': 0,
             'no_reference': 0,
-            'violent_threats': 0,  # NOUVEAU
+            'violent_threats': 0, 
         }
         
-        # 9. CONFIGURATION
         self.min_keywords_for_spam = 2
         self.caps_ratio_threshold = 0.6
     
@@ -314,11 +311,11 @@ class HeuristicRules:
         """Détecte spécifiquement les menaces de violence et extorsion"""
         email_lower = email_text.lower()
         
-        # Score de menace
+       
         threat_score = 0
         signals = []
         
-        # 1. Mots-clés de violence directs
+        
         violent_words = [
             'kill', 'tuer', 'murder', 'assassin',
             'hurt', 'blesser', 'harm', 'nuire',
@@ -332,14 +329,13 @@ class HeuristicRules:
                 threat_score += 2
                 signals.append(f"mot_violent: {word}")
         
-        # 2. Patterns de menaces violentes
+       
         for pattern in self.violent_threat_patterns:
             if re.search(pattern, email_lower):
                 threat_score += 3
                 signals.append("pattern_menace_violente")
                 break
-        
-        # 3. Extorsion avec menace
+     
         extortion_patterns = [
             r'give me (money|bitcoin|cash|argent) or i will',
             r'donne moi (argent|bitcoin|monnaie) ou je vais',
@@ -357,7 +353,7 @@ class HeuristicRules:
                 signals.append("extorsion_menace")
                 break
         
-        # 4. Structure conditionnelle menaçante
+        
         conditional_patterns = [
             r'if you don\'t .*? i will .*? (kill|hurt|harm|attack)',
             r'si tu ne .*? je vais .*? (tuer|blesser|nuire|attaquer)',
@@ -371,7 +367,7 @@ class HeuristicRules:
                 signals.append("condition_menaçante")
                 break
         
-        # 5. Pronoms personnels + verbes de menace
+       
         personal_threats = [
             ('i will', 'kill you'), ('i will', 'hurt you'),
             ('je vais', 'te tuer'), ('je vais', 'te blesser'),
@@ -385,7 +381,7 @@ class HeuristicRules:
                 signals.append(f"menace_personnelle: {pronoun} {action}")
                 break
         
-        # 6. Menaces de conséquence
+       
         consequence_words = ['regret', 'suffer', 'pay', 'consequences',
                            'regretter', 'souffrir', 'payer', 'conséquences',
                            'bad things', 'mauvaises choses', 'malheur']
@@ -399,7 +395,7 @@ class HeuristicRules:
             threat_score += 2
             signals.append(f"conséquences_multiples: {consequence_count}")
         
-        # Seuil de détection
+      
         if threat_score >= 4:
             self.rule_triggers['violent_threats'] += 1
             reason_parts = [f"Score menace: {threat_score}"]
@@ -415,7 +411,7 @@ class HeuristicRules:
         """
         email_lower = email_text.lower()
         
-        # Patterns qui indiquent une discussion LÉGITIME sur .exe
+       
         safe_discussion_patterns = [
             r'rapport.*\.exe',
             r'document.*\.exe',
@@ -428,12 +424,12 @@ class HeuristicRules:
             r'\.exe\s+(file|format|extension)',
         ]
         
-        # Vérifier SI une discussion légitime
+      
         for pattern in safe_discussion_patterns:
             if re.search(pattern, email_lower):
-                return False  # C'est sûr, juste une discussion
+                return False  
         
-        # Patterns dangereux RÉELS 
+      
         dangerous_action_patterns = [
             r'download\s+\w*\.exe',
             r'click\s+\w*\.exe',
@@ -450,7 +446,7 @@ class HeuristicRules:
                 self.rule_triggers['dangerous_attachment'] += 1
                 return True
         
-        # Vérifier les archives suspectes avec actions
+        
         archive_patterns = [
             r'download.*\.(zip|rar|7z)',
             r'télécharge.*\.(zip|rar|7z)',
@@ -479,25 +475,25 @@ class HeuristicRules:
         """
         email_lower = email_text.lower()
         
-        # Vérifier d'abord si c'est un email légitime français
+        
         legitimate_score = 0
         for pattern in self.french_legitimate_patterns:
             if pattern in email_lower:
                 legitimate_score += 1
         
-        # Si 2+ patterns légitimes détectés, être plus tolérant
+        
         if legitimate_score >= 2:
-            # Augmenter le seuil pour ces emails
+    
             required_keywords = 3
         else:
             required_keywords = self.min_keywords_for_spam
         
-        # Compter les mots-clés spam - CORRIGÉ : recherche exacte
+       
         count = 0
         found_keywords = []
         
         for keyword in self.spam_keywords:
-            # Vérifier avec regex pour trouver le mot-clé exact (pas une sous-chaîne)
+          
             pattern = r'\b' + re.escape(keyword) + r'\b'
             if re.search(pattern, email_lower):
                 count += 1
@@ -511,7 +507,7 @@ class HeuristicRules:
     
     def check_excessive_punctuation(self, email_text):
         """Détecte la ponctuation excessive (!!!, ???, ...)"""
-        # Plus strict : au moins 3 répétitions
+       
         patterns = [
             r'!{4,}',      # !!!! (4+)
             r'\?{4,}',     # ???? (4+)
@@ -530,13 +526,13 @@ class HeuristicRules:
             return False
         
         letters = [c for c in email_text if c.isalpha()]
-        if len(letters) < 20:  # Pas assez de lettres
+        if len(letters) < 20: 
             return False
         
         caps_count = sum(1 for c in letters if c.isupper())
         caps_ratio = caps_count / len(letters)
         
-        # Seuil augmenté pour réduire faux positifs
+    
         if caps_ratio > self.caps_ratio_threshold:
             self.rule_triggers['excessive_caps'] += 1
             return True
@@ -546,13 +542,13 @@ class HeuristicRules:
         """Détecte les menaces et fausses urgences - VERSION AMÉLIORÉE"""
         email_lower = email_text.lower()
         
-        # Vérifier les patterns de menaces directs
+        
         for pattern in self.threat_patterns:
             if re.search(pattern, email_lower):
                 self.rule_triggers['threats'] += 1
                 return True
         
-        # Vérification supplémentaire pour les menaces violentes explicites
+        
         violent_phrases = [
             # Menaces de mort
             'i will kill you', 'kill you', 'going to kill',
@@ -579,8 +575,7 @@ class HeuristicRules:
             if phrase in email_lower:
                 self.rule_triggers['threats'] += 1
                 return True
-        
-        # Vérifier la structure "if...then" menaçante
+       
         if_then_patterns = [
             r'if you (don\'t|do not) .*? (i will|i\'ll) .*? (kill|hurt|harm|attack)',
             r'si tu (ne|n\') .*? (je vais|j\'vais) .*? (tuer|blesser|nuire|attaquer)',
@@ -600,7 +595,7 @@ class HeuristicRules:
         Détecte les montants d'argent suspects 
         Seulement les GROS montants ou combinés avec mots-clés spam
         """
-        # Patterns pour gros montants seulement
+        
         big_money_patterns = [
             r'[\$€]\s*\d{4,}', 
             r'\d{4,}\s*[\$€]\s*[\$DA]\s*[\$da]',  
@@ -609,7 +604,7 @@ class HeuristicRules:
         
         for pattern in big_money_patterns:
             if re.search(pattern, email_text, re.IGNORECASE):
-                # Vérifier si combiné avec mots spam
+                
                 email_lower = email_text.lower()
                 spam_money_words = ['win', 'gagner', 'free', 'gratuit', 'prize', 'prix']
                 
@@ -640,7 +635,7 @@ class HeuristicRules:
             if phrase in email_lower:
                 phishing_score += 1
         
-        # 2. Menace voilée de limitation
+       
         limitation_phrases = [
             'service limitations', 'temporarily unavailable',
             'features may be temporarily unavailable', 'limited access',
@@ -651,7 +646,7 @@ class HeuristicRules:
         
         for phrase in limitation_phrases:
             if phrase in email_lower:
-                phishing_score += 2  # Plus grave
+                phishing_score += 2 
         
         time_pressure = [
             'within the next few days', 'in the next few days',
@@ -664,7 +659,7 @@ class HeuristicRules:
             if phrase in email_lower:
                 phishing_score += 1
         
-        # 4. Lien caché ou emoji de lien
+        
         link_indicators = ['👉', 'lien ci-dessous', 'link below', 'cliquez ici', 'click here',
                           'suivant le lien', 'via le lien', 'formulaire ci-dessous',
                           'bouton ci-dessous', 'button below', '🔗']
@@ -674,7 +669,7 @@ class HeuristicRules:
                 phishing_score += 2
                 break
         
-        # 5. Signature générique
+    
         generic_signatures = [
             'support services', 'account management team',
             'service assistance', 'gestion des comptes',
@@ -687,24 +682,22 @@ class HeuristicRules:
             if signature in email_lower:
                 phishing_score += 1
         
-        # 6. Absence d'informations spécifiques
-        # Les vrais emails de service ont des références
+       
         has_reference = any(word in email_lower for word in 
                            ['reference', 'ticket', 'case', 'dossier', 'numéro', '#', 'id:', 'ref:'])
-        
-        # 7. Pas de nom de contact spécifique
+       
         has_specific_contact = any(word in email_lower for word in
                                   ['john', 'sarah', 'michael', 'david', 'lisa',  
                                    'mr.', 'ms.', 'm.', 'madame', 'monsieur'])  
         
-        # Calcul final
+      
         if not has_reference:
             phishing_score += 1
         
         if not has_specific_contact and phishing_score >= 2:
             phishing_score += 1
         
-        # Déclencher si 4 points ou plus (seuil sensible)
+        
         if phishing_score >= 4:
             self.rule_triggers['phishing_sophisticated'] = self.rule_triggers.get('phishing_sophisticated', 0) + 1
             return True
@@ -737,15 +730,14 @@ class HeuristicRules:
             if phrase in email_lower:
                 phishing_score += 2
                 signals.append(f"jargon_compliance: {phrase}")
-                break  # Un seul suffit
+                break 
         
-        # 2. Contradiction interne ("aucune action urgente" mais menace implicite)
+        
         if 'aucune action urgente' in email_lower or 'no urgent action' in email_lower:
             if 'pourraient être ajustées' in email_lower or 'could be adjusted' in email_lower:
                 phishing_score += 3
                 signals.append("contradiction_urgence_mesure")
-        
-        # 3. Menace voilée sous forme de "recommandation"
+
         threat_patterns = [
             r'afin d\'éviter toute mesure automatique',
             r'to avoid any automatic measures',
@@ -760,13 +752,12 @@ class HeuristicRules:
                 phishing_score += 2
                 signals.append("menace_voilee")
                 break
-        
-        # 4. Lien avec emoji + appel à action
+      
         if '👉' in email_text and any(word in email_lower for word in ['accéder', 'access', 'consulter', 'consult']):
             phishing_score += 3
             signals.append("lien_avec_emoji")
         
-        # 5. Signature générique de service
+        
         generic_services = [
             'cellule conformité',
             'services numériques',
@@ -782,12 +773,12 @@ class HeuristicRules:
                 signals.append(f"service_generique: {service}")
                 break
         
-        # 6. Absence totale de référence personnelle
+       
         if not any(pattern in email_lower for pattern in ['votre dossier', 'votre compte', 'référence', 'ticket', 'case', '#']):
             phishing_score += 2
             signals.append("absence_reference")
         
-        # Seuil de détection pour ce type sophistiqué
+        
         if phishing_score >= 6:
             self.rule_triggers['phishing_sophisticated'] = self.rule_triggers.get('phishing_sophisticated', 0) + 1
             return True, f"Phishing conformité détecté: {', '.join(signals)}"
@@ -798,7 +789,6 @@ class HeuristicRules:
         """Détecte les menaces passives (pourraient, pourrait être)"""
         email_lower = email_text.lower()
         
-        # Patterns de menaces passives
         passive_threat_patterns = [
             r'pourraient\s+être\s+(ajustées?|limitée?s?|restreintes?|modifiées?)',
             r'could\s+be\s+(adjusted|limited|restricted|modified)',
@@ -810,7 +800,7 @@ class HeuristicRules:
         
         for pattern in passive_threat_patterns:
             if re.search(pattern, email_lower):
-                # Vérifier si combiné avec appel à action
+                
                 if any(word in email_lower for word in ['👉', 'cliquez', 'click', 'accéder', 'access']):
                     return True, "Menace passive avec appel à action détectée"
         
@@ -820,14 +810,14 @@ class HeuristicRules:
         """Détecte le phishing indirect/subtil"""
         email_lower = email_text.lower()
         
-        # 1. Vérifier les patterns de phishing indirect
+       
         indirect_score = 0
         for pattern in self.indirect_phishing_patterns:
             if re.search(pattern, email_lower):
                 indirect_score += 2
         
-        # 2. Email court mais avec termes suspects
-        if len(email_text) < 150:  # Email court
+       
+        if len(email_text) < 150: 
             short_suspicious_terms = [
                 'vérification', 'compte', 'nécessaire', 'requis',
                 'sécurité', 'action', 'urgence', 'important',
@@ -842,7 +832,7 @@ class HeuristicRules:
             if term_count >= 2:
                 indirect_score += 2
         
-        # 3. Absence de références légitimes
+       
         has_legitimate_reference = any(pattern in email_lower for pattern in [
             'référence', 'ticket', 'dossier', 'numéro', '#', 
             'facture', 'devis', 'commande', 'contrat',
@@ -853,7 +843,7 @@ class HeuristicRules:
             indirect_score += 2
             self.rule_triggers['no_reference'] += 1
         
-        # 4. Appel générique vs spécifique
+        
         has_generic_call = any(pattern in email_lower for pattern in [
             'cher client', 'cher utilisateur', 'dear customer', 'dear user'
         ])
@@ -866,7 +856,7 @@ class HeuristicRules:
         if has_generic_call and not has_specific_call:
             indirect_score += 1
         
-        # Seuil de détection
+     
         if indirect_score >= 5:
             self.rule_triggers['phishing_indirect'] += 1
             return True, f"Phishing indirect détecté (score: {indirect_score})"
@@ -875,10 +865,10 @@ class HeuristicRules:
     
     def check_short_suspicious_email(self, email_text):
         """Détecte les emails courts mais suspects"""
-        if len(email_text) < 120:  # Très court
+        if len(email_text) < 120:  
             email_lower = email_text.lower()
             
-            # Termes suspects dans un email court
+           
             suspicious_in_short = [
                 'vérification de compte',
                 'compte nécessaire',
@@ -896,7 +886,6 @@ class HeuristicRules:
                 if term in email_lower:
                     count += 1
             
-            # Si l'email est court et contient 2+ termes suspects
             if count >= 2:
                 self.rule_triggers['short_suspicious'] += 1
                 return True, f"Email court mais suspect ({count} indicateurs)"
@@ -908,44 +897,43 @@ class HeuristicRules:
         Applique toutes les règles heuristiques 
         Ordre d'exécution optimisé
         """
-        # 0. Vérification ultra-rapide des menaces extrêmes (PRIORITÉ MAXIMALE)
+        
         is_extreme_threat, extreme_reason = self.check_extreme_threats(email_text)
         if is_extreme_threat:
             return True, extreme_reason
         
-        # 1. Menaces violentes spécifiques
+      
         is_violent_threat, violent_reason = self.check_violent_threats(email_text)
         if is_violent_threat:
             return True, violent_reason
         
-        # 2. Pièces jointes dangereuses (très fiable)
+       
         if self.check_dangerous_attachments(email_text):
             return True, "Pièce jointe dangereuse détectée (.exe, .zip avec action suspecte)"
         
-        # 3. URLs suspectes (fiable)
+   
         if self.check_suspicious_urls(email_text):
             return True, "URL raccourcie suspecte détectée (bit.ly, tinyurl, etc.)"
         
-        # 4. Menaces directes
+    
         if self.check_threats(email_text):
             return True, "Menace ou ultimatum détecté"
-        
-        # 5. Phishing conformité sophistiqué
+    
         is_compliance_phishing, compliance_reason = self.check_compliance_phishing(email_text)
         if is_compliance_phishing:
             return True, compliance_reason
         
-        # 6. Phishing indirect
+       
         is_indirect_phishing, indirect_reason = self.check_indirect_phishing(email_text)
         if is_indirect_phishing:
             return True, indirect_reason
         
-        # 7. Email court mais suspect
+       
         is_short_suspicious, short_reason = self.check_short_suspicious_email(email_text)
         if is_short_suspicious:
             return True, short_reason
         
-        # 8. Menaces passives
+       
         is_passive_threat, passive_reason = self.check_passive_threats(email_text)
         if is_passive_threat:
             return True, passive_reason
@@ -973,11 +961,11 @@ class HeuristicRules:
             signals += 1
             reasons.append("ponctuation excessive")
         
-        # Déclencher seulement si 2+ signaux
+       
         if signals >= 2:
             return True, f"Signaux spam combinés: {', '.join(reasons)}"
         
-        # Aucune règle déclenchée
+       
         return False, ""
     
     def get_statistics(self):

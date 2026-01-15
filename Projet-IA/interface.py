@@ -26,7 +26,7 @@ else:
     spam_filter.ml_classifier.save_model(model_path)
     print("Modèle entraîné et sauvegardé")
 
-# Statistiques globales
+
 stats = {"total": 0, "spam": 0, "legitimate": 0}
 
 def analyze_email(email_text):
@@ -35,17 +35,17 @@ def analyze_email(email_text):
     if not email_text or not email_text.strip():
         return " Veuillez entrer un email à analyser", "", "", "", ""
     
-    # Analyser avec seuil fixe (pas de réglage manuel)
+ 
     result = spam_filter.classify(email_text)
     
-    # Mettre à jour les stats
+   
     stats["total"] += 1
     if result['is_spam']:
         stats["spam"] += 1
     else:
         stats["legitimate"] += 1
     
-    # Préparer le résultat
+   
     if result['is_spam']:
         verdict = "🚫 **SPAM DÉTECTÉ**"
         verdict_color = "#fee"
@@ -57,7 +57,7 @@ def analyze_email(email_text):
     confidence = f"**Confiance:** {result['confidence']:.0%}"
     reason = f"**Raison:** {result['reason']}"
     
-    # Stats globales
+    
     stats_text = f"""
      **Statistiques globales:**
     - Total analysés: {stats['total']}
@@ -69,7 +69,7 @@ def analyze_email(email_text):
     return verdict, method, confidence, reason, stats_text
 
 
-# Exemples prédéfinis (simplifiés sans seuil)
+
 examples = [
     "give me money if you don't give it i will kill you",
     "Bonjour, Dans le cadre de nos vérifications régulières, un paramétrage de votre compte nécessite une attention particulière. 👉 Accéder à mon espace",
@@ -139,7 +139,7 @@ with gr.Blocks(title="Anti-Spam Hybride", theme=gr.themes.Soft()) as demo:
             reason_output = gr.Markdown(label="###  Explication détaillée")
             stats_output = gr.Markdown(label="### 📊 Statistiques")
     
-    gr.Markdown("### -> Exemples à tester")
+    gr.Markdown("### ** Exemples à tester**")
     gr.Examples(
         examples=examples,
         inputs=[email_input],
@@ -148,7 +148,7 @@ with gr.Blocks(title="Anti-Spam Hybride", theme=gr.themes.Soft()) as demo:
     
     gr.Markdown("""
     ---
-    ->  Comment fonctionne notre système ?
+   ### Comment fonctionne notre système ?
     
     ** Règles Heuristiques (Rapide & Fiable)**
     - Détecte automatiquement les fichiers dangereux (.exe, .bat, .vbs)
@@ -174,6 +174,8 @@ with gr.Blocks(title="Anti-Spam Hybride", theme=gr.themes.Soft()) as demo:
         inputs=[email_input],
         outputs=[verdict_output, method_output, confidence_output, reason_output, stats_output]
     )
+
+
 
 if __name__ == "__main__":
     print("\n" + "="*60)
@@ -270,7 +272,7 @@ if __name__ == "__main__":
                 print(f"   4. Installez la dernière version: pip install --upgrade gradio")
         
         else:
-            
+            # Mode LOCAL (option 2)
             print(f"\n INTERFACE LOCALE")
             print(f" URL: http://localhost:{port}")
             print(f" URL réseau: http://127.0.0.1:{port}")
@@ -278,7 +280,7 @@ if __name__ == "__main__":
             
             try:
                 demo.launch(
-                    share=False,         
+                    share=False,         # Pas de lien public
                     server_name="127.0.0.1",
                     server_port=port,
                     show_error=True,

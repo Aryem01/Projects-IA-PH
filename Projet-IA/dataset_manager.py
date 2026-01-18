@@ -220,6 +220,7 @@ class DatasetManager:
         print(f" Génération de {count} emails légitimes synthétiques...")
         
         templates = [
+            # Anglais
             "Hi {name}, here is the {doc_type} for {period}. Please review and let me know if you have questions. Best regards",
             "Dear {name}, I wanted to follow up on our meeting last {day}. Could we schedule another call for next week?",
             "Hello {name}, the project update is attached. We're on track for the {month} deadline. Thanks for your support.",
@@ -229,21 +230,16 @@ class DatasetManager:
             "Dear {name}, thank you for your email. I will review the documents and get back to you by {day}.",
             "Hello, the monthly report is ready. Key highlights: revenue increased by {percent}% compared to last month.",
             "{name}, following up on your request from last week. I've attached the requested information.",
-            "Hi {name}, congratulations on the successful project launch! Looking forward to the next phase."
+            "Hi {name}, congratulations on the successful project launch! Looking forward to the next phase.",
+            
+            # Français
+            "Bonjour {name}, nous accusons réception de votre {doc_type}. Le traitement est en cours.",
+            "Madame, Monsieur, votre dossier a bien été reçu le {date}. Nous vous tiendrons informé.",
+            "Objet : Suivi de votre demande. Votre requête est actuellement à l'étude.",
+            "Cher collègue, veuillez trouver ci-joint le {doc_type} demandé. Cordialement",
+            "Service client : Votre ticket #{number} est en cours de traitement. Merci de votre patience.",
         ]
         
-    
-        templates = [
-          
-          "Hi {name}, here is the {doc_type} for {period}. Please review...",
-        
-          #  Français
-          "Bonjour {name}, nous accusons réception de votre {doc_type}. Le traitement est en cours.",
-          "Madame, Monsieur, votre dossier a bien été reçu le {date}. Nous vous tiendrons informé.",
-           "Objet : Suivi de votre demande. Votre requête est actuellement à l'étude.",
-           "Cher collègue, veuillez trouver ci-joint le {doc_type} demandé. Cordialement",
-           "Service client : Votre ticket #{number} est en cours de traitement. Merci de votre patience.",
-        ]
         names = ["John", "Sarah", "Michael", "Emma", "David", "Lisa", "Robert", "Jennifer", "Tom", "Mary"]
         doc_types = ["report", "presentation", "analysis", "summary", "proposal", "contract"]
         periods = ["Q1", "Q2", "Q3", "Q4", "January", "February", "March", "this quarter"]
@@ -262,7 +258,9 @@ class DatasetManager:
                 month=random.choice(months),
                 time=random.choice(times),
                 quarter=random.randint(1, 4),
-                percent=random.randint(5, 25)
+                percent=random.randint(5, 25),
+                number=random.randint(1000, 9999),
+                date=f"{random.randint(1, 28)}/{random.randint(1, 12)}/2024"
             )
             
             emails.append({

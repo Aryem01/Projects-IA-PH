@@ -1,8 +1,3 @@
-"""
-Règles heuristiques pour la détection de spam - VERSION AMÉLIORÉE
-Détection des spams indirects, phishing subtils et menaces violentes
-"""
-
 import re
 
 class HeuristicRules:
@@ -891,82 +886,127 @@ class HeuristicRules:
                 return True, f"Email court mais suspect ({count} indicateurs)"
         
         return False, ""
+    def is_clearly_ham(self, email_text):
+ 
+     email_lower = email_text.lower()
+     if 'je me permets de vous contacter' in email_lower:
+         if 'projet' in email_lower and 'respectueusement' in email_lower:
+              return True, "Email professionnel de suivi"
     
+   
+     if ('bonjour' in email_lower or 'monsieur' in email_lower or 'madame' in email_lower) and \
+       ('respectueusement' in email_lower or 'cordialement' in email_lower):
+ 
+        professional_keywords = ['projet', 'document', 'réunion', 'information', 'dossier', 
+                                'traitement', 'service', 'client', 'demande']
+        if any(keyword in email_lower for keyword in professional_keywords):
+            
+            spam_indicators = ['!!!', '???', 'gratuit', 'gagner', 'urgent!', 'bit.ly', 'tinyurl']
+            if not any(indicator in email_lower for indicator in spam_indicators):
+                return True, "Email professionnel avec formules de politesse"
+    
+    
+     if any(ref in email_lower for ref in ['référence', 'dossier n°', 'numéro', '#', 'ref:']) and \
+       'cordialement' in email_lower:
+        return True, "Email administratif avec référence"
+    
+   
+     if len(email_text) < 200:
+        if 'bonjour' in email_lower and ('cordialement' in email_lower or 'merci' in email_lower):
+            # Vérifier que ce n'est pas un spam
+            if not any(spam in email_lower for spam in ['!!!', '???', 'gagner', 'gratuit']):
+                if any(pro in email_lower for pro in ['projet', 'document', 'réunion']):
+                    return True, "Courte communication professionnelle"
+    
+     return False, ""
+ 
     def apply_rules(self, email_text):
-        """
-        Applique toutes les règles heuristiques 
-        Ordre d'exécution optimisé
-        """
+       
+  
+     is_ham, ham_reason = self.is_clearly_ham(email_text)
+     if is_ham:
+        return False, f"Email légitime détecté: {ham_reason}"
+    
+   
+     is_extreme_threat, extreme_reason = self.check_extreme_threats(email_text)
+     if is_extreme_threat:
+         return True, extreme_reason
+    
+  
+     is_ham, ham_reason = self.is_clearly_ham(email_text)
+     if is_ham:
+            return False, f"Email légitime: {ham_reason}"
         
-        is_extreme_threat, extreme_reason = self.check_extreme_threats(email_text)
-        if is_extreme_threat:
+        
+     is_extreme_threat, extreme_reason = self.check_extreme_threats(email_text)
+     if is_extreme_threat:
             return True, extreme_reason
         
       
-        is_violent_threat, violent_reason = self.check_violent_threats(email_text)
-        if is_violent_threat:
+     is_violent_threat, violent_reason = self.check_violent_threats(email_text)
+     if is_violent_threat:
             return True, violent_reason
         
        
-        if self.check_dangerous_attachments(email_text):
+     if self.check_dangerous_attachments(email_text):
             return True, "Pièce jointe dangereuse détectée (.exe, .zip avec action suspecte)"
         
    
-        if self.check_suspicious_urls(email_text):
+     if self.check_suspicious_urls(email_text):
             return True, "URL raccourcie suspecte détectée (bit.ly, tinyurl, etc.)"
         
     
-        if self.check_threats(email_text):
+     if self.check_threats(email_text):
             return True, "Menace ou ultimatum détecté"
     
-        is_compliance_phishing, compliance_reason = self.check_compliance_phishing(email_text)
-        if is_compliance_phishing:
+     is_compliance_phishing, compliance_reason = self.check_compliance_phishing(email_text)
+     if is_compliance_phishing:
             return True, compliance_reason
         
        
-        is_indirect_phishing, indirect_reason = self.check_indirect_phishing(email_text)
-        if is_indirect_phishing:
+     is_indirect_phishing, indirect_reason = self.check_indirect_phishing(email_text)
+     if is_indirect_phishing:
             return True, indirect_reason
         
        
-        is_short_suspicious, short_reason = self.check_short_suspicious_email(email_text)
-        if is_short_suspicious:
+     is_short_suspicious, short_reason = self.check_short_suspicious_email(email_text)
+     if is_short_suspicious:
             return True, short_reason
         
        
-        is_passive_threat, passive_reason = self.check_passive_threats(email_text)
-        if is_passive_threat:
+     is_passive_threat, passive_reason = self.check_passive_threats(email_text)
+     if is_passive_threat:
             return True, passive_reason
         
        
-        if self.check_phishing_sophisticated(email_text):
+     if self.check_phishing_sophisticated(email_text):
             return True, "Tentative de phishing sophistiquée détectée"
     
-        signals = 0
-        reasons = []
+     signals = 0
+     reasons = []
         
-        if self.check_money_amounts(email_text):
+     if self.check_money_amounts(email_text):
             signals += 1
             reasons.append("gros montant d'argent")
         
-        if self.check_spam_keywords(email_text):
+     if self.check_spam_keywords(email_text):
             signals += 2
             reasons.append("mots-clés spam multiples")
         
-        if self.check_excessive_caps(email_text):
+     if self.check_excessive_caps(email_text):
             signals += 1
             reasons.append("majuscules excessives")
         
-        if self.check_excessive_punctuation(email_text):
+     if self.check_excessive_punctuation(email_text):
             signals += 1
             reasons.append("ponctuation excessive")
         
        
-        if signals >= 2:
+     if signals >= 2:
             return True, f"Signaux spam combinés: {', '.join(reasons)}"
         
        
-        return False, ""
+     return False, ""
     
     def get_statistics(self):
         """Retourne les statistiques de déclenchement des règles"""
@@ -976,16 +1016,174 @@ class HeuristicRules:
         """Réinitialise les statistiques"""
         for key in self.rule_triggers:
             self.rule_triggers[key] = 0
+            
+               
+    def _is_general_professional_email(self, email_text):
+  
+        email_lower = email_text.lower()
+ 
+        score = 0
+        
+        
+        positive_keywords = [
+            'projet', 'github', 'dépôt', 'code', 'collaboration', 'conseils',
+            'compte rendu', 'réunion', 'modifications', 'intégrées',
+            'vérifier', 'retour', 'nécessaire', 'travail', 'équipe',
+            'développement', 'ia', 'ai', 'programmation', 'logiciel',
+            'document', 'pièce jointe', 'fichier', 'rapport', 'analyse',
+            'mise à jour', 'update', 'avancement', 'progression',
+            'feedback', 'retour', 'review', 'revue', 'commentaires',
+            'tâche', 'mission', 'objectif', 'délai', 'échéance',
+            'réunion', 'meeting', 'conférence', 'présentation',
+            'client', 'collègue', 'manager', 'équipe', 'service'
+        ]
+        
+        positive_count = 0
+        for keyword in positive_keywords:
+            if keyword in email_lower:
+                positive_count += 1
+                score += 1
+        
 
+        if 'bonjour' in email_lower or 'hello' in email_lower or 'hi ' in email_lower:
+            score += 2
+            if any(end in email_lower for end in ['cordialement', 'bien cordialement', 'merci', 'sincerely', 'regards', 'best regards']):
+                score += 3
+        
 
-# TEST
+        if 'objet :' in email_lower or 'subject:' in email_lower:
+            score += 2
+        
+        spam_indicators = [
+            '!!!', '???', '...', '!!', '??',
+            'gratuit', 'free', 'gagner', 'win', 'winner',
+            'argent', 'money', 'cash', '€', '$',
+            'urgent!', 'urgent', 'immédiat', 'immediate',
+            'cliquez', 'click', 'bit.ly', 'tinyurl', 'goo.gl',
+            'gagnez', 'winner', 'lottery', 'loterie',
+            'limited time', 'temps limité', 'offer ends', 'offre se termine'
+        ]
+        
+        spam_count = 0
+        for indicator in spam_indicators:
+            if indicator in email_lower:
+                spam_count += 1
+                score -= 3 
+        
+       
+        length = len(email_text)
+        if 100 <= length <= 2000:   
+            score += 2
+        elif length < 100: 
+          
+            if positive_count >= 2 and 'bonjour' in email_lower:
+                score += 1
+        
+
+        polite_words = ['merci', 'thank you', 'thanks', 'cordialement', 'sincerely', 
+                       'regards', 'best regards', 'salutations', 'kind regards']
+        if any(polite in email_lower for polite in polite_words):
+            score += 2
+        
+   
+        threat_words = ['tuer', 'kill', 'donne', 'give me', 'send me', 'envoie moi',
+                       'money', 'argent', 'bitcoin', 'crypto', 'payer', 'pay',
+                       'sinon', 'or else', 'otherwise', 'i will', 'je vais']
+        has_threats = any(threat in email_lower for threat in threat_words)
+        
+        if not has_threats:
+            score += 2
+  
+        if any(ref in email_lower for ref in ['projet', 'project', 'réf', 'ref', '#', 'numéro', 'number']):
+            score += 1
+
+        if score >= 7 and spam_count <= 1:  
+            self.rule_triggers['professional_work'] = self.rule_triggers.get('professional_work', 0) + 1
+            return True, f"Email professionnel détecté (score: {score}, {positive_count} mots-clés positifs)"
+        
+        return False, ""
+
+    def _check_short_professional_email(self, email_text):
+   
+        if len(email_text) < 150:   
+            email_lower = email_text.lower()
+            
+            has_structure = (('bonjour' in email_lower or 'hello' in email_lower) and 
+                           any(end in email_lower for end in ['cordialement', 'merci', 'thanks', 'regards']))
+            
+            if not has_structure:
+                return False, ""
+            
+            
+            professional_terms = [
+                'projet', 'project', 'réunion', 'meeting', 
+                'document', 'document', 'code', 'github', 
+                'travail', 'work', 'équipe', 'team',
+                'update', 'mise à jour', 'feedback', 'retour'
+            ]
+            pro_term_count = sum(1 for term in professional_terms if term in email_lower)
+            
+          
+            spam_terms = ['!!!', '???', 'urgent!', 'gratuit', 'free', 'gagner', 'win', 'cliquez ici', 'click here']
+            has_spam_terms = any(term in email_lower for term in spam_terms)
+            
+            if has_structure and pro_term_count >= 1 and not has_spam_terms:
+                self.rule_triggers['short_professional'] = self.rule_triggers.get('short_professional', 0) + 1
+                return True, f"Email professionnel court ({pro_term_count} termes professionnels)"
+        
+        return False, ""
+
+    def _force_professional_detection(self, email_text):
+    
+        """
+        Détection FORCÉE pour emails clairement professionnels
+        """
+        email_lower = email_text.lower()
+        
+       
+        if 'ci-joint' in email_lower or 'ci joint' in email_lower:
+            if 'cordialement' in email_lower and ('bonjour' in email_lower or 'veuillez' in email_lower):
+                return True, "Email formel avec pièce jointe"
+        
+      
+        if 'veuillez trouver' in email_lower and 'cordialement' in email_lower:
+            return True, "Formulation formelle 'Veuillez trouver'"
+        
+       
+        if 'votre disposition' in email_lower and 'cordialement'and ' Respectueusement ' in email_lower:
+            return True, "Formulation professionnelle de disponibilité"
+        email_lower = email_text.lower()
+        
+       
+        if 'github' in email_lower and 'projet' in email_lower:
+            if 'bonjour' in email_lower and ('cordialement' in email_lower or 'merci' in email_lower):
+                return True, "Email projet GitHub détecté"
+        
+        if ('compte rendu' in email_lower or 'réunion' in email_lower) and 'points' in email_lower:
+            if 'bonjour' in email_lower and len(email_text) > 80:
+                return True, "Compte rendu réunion détecté"
+        
+        if 'objet :' in email_lower:
+   
+            lines = email_text.split('\n')
+            for line in lines:
+                if 'objet :' in line.lower():
+                    subject = line.lower()
+                  
+                    professional_subjects = ['projet', 'mise à jour', 'update', 'réunion', 'meeting', 
+                                           'rapport', 'report', 'document', 'code', 'développement']
+                    if any(keyword in subject for keyword in professional_subjects):
+                        if 'bonjour' in email_lower:
+                            return True, f"Email avec sujet professionnel: {subject[:50]}..."
+        
+        return False, ""
 if __name__ == "__main__":
     print(" Test des règles améliorées avec détection de menaces violentes...\n")
     
     rules = HeuristicRules()
     
     test_emails = [
-        # Menaces violentes - DEVRAIENT ÊTRE DÉTECTÉS COMME SPAM
+       
         ("give me monney if you don't give it i will kill you", True),
         ("give me money or i will hurt you", True),
         ("donne moi l'argent sinon je vais te tuer", True),
@@ -994,8 +1192,6 @@ if __name__ == "__main__":
         ("je vais te blesser si tu ne donnes pas", True),
         ("pay me $1000 or i will destroy you", True),
         ("transfer the money or you will regret", True),
-        
-        # Phishing indirect
         ("bonjour Une vérification de votre compte est nécessaire", True),
         ("Cher client, une action est requise pour votre compte", True),
         ("Notification: problème de sécurité détecté sur votre compte", True),

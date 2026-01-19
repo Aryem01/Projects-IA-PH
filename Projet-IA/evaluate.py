@@ -1,7 +1,3 @@
-"""
-Évaluation du système anti-spam hybride 
-Calcul des métriques: précision, faux positifs, faux négatifs, etc.
-"""
 
 import numpy as np
 from sklearn.metrics import (

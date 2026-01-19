@@ -1,6 +1,3 @@
-"""
-Dataset Manager pour le vrai dataset Enron  + spam synthétique
-"""
 
 import os
 import random
@@ -30,8 +27,7 @@ class DatasetManager:
         
         legitimate_emails = []
         email_count = 0
-        
-        # Vérifier si maildir existe
+   
         if not self.enron_dir.exists():
             print(f" Dossier 'maildir' non trouvé dans: {self.enron_dir.absolute()}")
             print("   Utilisation de données synthétiques à la place.")
@@ -402,11 +398,10 @@ if __name__ == "__main__":
     
     dm = DatasetManager()
     
-    # Vérifier si maildir existe
+   
     if dm.enron_dir.exists():
         print(f" maildir trouvé: {dm.enron_dir.absolute()}")
-        
-        # Tester le chargement de quelques emails
+
         print("\nTest de chargement des emails Enron...")
         emails = dm._load_real_enron_emails(max_emails=10)
         

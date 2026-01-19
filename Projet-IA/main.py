@@ -1,6 +1,4 @@
-"""
-SCRIPT PRINCIPAL - PROJET ANTI-SPAM HYBRIDE
-"""
+
 from dataset_manager import DatasetManager
 from hybrid_filter import HybridSpamFilter
 from evaluate import SpamFilterEvaluator
